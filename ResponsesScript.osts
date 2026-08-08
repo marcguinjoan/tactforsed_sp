@@ -1,0 +1,106 @@
+// Office Script para answers_pilottact_sp.xlsx (equivalente al Code.gs de Google Apps Script).
+//
+// Recibe el mismo payload JSON que envía el simulador (flat, assign, timestampClient,
+// totalSeconds), lo añade como una fila nueva en la hoja «Respuestas» y crea las columnas
+// que hagan falta (cabecera dinámica: hay ramas condicionales, así que no todas las filas
+// tienen las mismas variables).
+//
+// Este script se ejecuta desde un flujo de Power Automate con disparador HTTP: el flujo pasa
+// el cuerpo de la petición como el parámetro `payloadJson` (una cadena de texto), y este script
+// hace el resto. No se ejecuta solo: hace falta desplegar el flujo (ver README.md).
+
+interface FixedAssign {
+  modo_revision?: number;
+  n_saltos?: number;
+  n_reasignaciones?: number;
+  block_order?: string;
+  spain_split_exp1?: string;
+  rama?: string;
+  list_arm?: number | string;
+  condition_traits?: string;
+  exp3_block?: string;
+  condition_debunk?: string;
+  condition_prebunk?: string;
+  terminado_en?: string;
+}
+interface Payload {
+  flat?: { [key: string]: string | number | null };
+  assign?: FixedAssign;
+  timestampClient?: string;
+  totalSeconds?: number;
+}
+
+const SHEET_NAME = 'Respuestas';
+const FIXED_COLS = [
+  'timestamp_servidor', 'timestamp_client', 'temps_total_segons',
+  'modo_revision', 'n_saltos', 'n_reasignaciones',
+  'block_order', 'spain_split_exp1', 'rama', 'list_arm',
+  'condition_traits', 'exp3_block', 'condition_debunk', 'condition_prebunk',
+  'terminado_en'
+];
+
+function main(workbook: ExcelScript.Workbook, payloadJson: string): { status: string; columnas?: number; nuevasColumnas?: number; message?: string } {
+  try {
+    const data: Payload = JSON.parse(payloadJson);
+    const flat = data.flat || {};
+    const assign = data.assign || {};
+
+    let sheet = workbook.getWorksheet(SHEET_NAME);
+    if (!sheet) sheet = workbook.addWorksheet(SHEET_NAME);
+
+    const used = sheet.getUsedRange(true);
+    let header: string[];
+    let lastCol: number;
+
+    if (!used || used.getRowCount() === 0 || sheet.getRange('A1').getValue() === '') {
+      header = FIXED_COLS.slice();
+      const headerRange = sheet.getRangeByIndexes(0, 0, 1, header.length);
+      headerRange.setValues([header]);
+      headerRange.getFormat().getFont().setBold(true);
+      sheet.getFreezePanes().freezeRows(1);
+      lastCol = header.length;
+    } else {
+      lastCol = used.getColumnCount();
+      const headerRange = sheet.getRangeByIndexes(0, 0, 1, lastCol);
+      header = headerRange.getValues()[0].map(v => String(v));
+    }
+
+    // cabecera dinámica: columnas nuevas que trae esta respuesta y la hoja aún no tiene
+    const known: { [k: string]: boolean } = {};
+    header.forEach(h => { known[h] = true; });
+    const newCols: string[] = [];
+    Object.keys(flat).forEach(k => { if (!known[k]) { newCols.push(k); known[k] = true; } });
+
+    if (newCols.length > 0) {
+      const addRange = sheet.getRangeByIndexes(0, lastCol, 1, newCols.length);
+      addRange.setValues([newCols]);
+      addRange.getFormat().getFont().setBold(true);
+      header = header.concat(newCols);
+      lastCol = header.length;
+    }
+
+    const values: { [k: string]: string | number } = {
+      timestamp_servidor: new Date().toISOString(),
+      timestamp_client: data.timestampClient || '',
+      temps_total_segons: data.totalSeconds != null ? data.totalSeconds : ''
+    };
+    Object.keys(assign).forEach(k => {
+      const v = (assign as { [k: string]: string | number | undefined })[k];
+      values[k] = v == null ? '' : v;
+    });
+    Object.keys(flat).forEach(k => {
+      const v = flat[k];
+      values[k] = v == null ? '' : v;
+    });
+
+    const row = header.map(name => (values.hasOwnProperty(name) ? values[name] : ''));
+
+    const nextRowIndex = (used ? used.getRowCount() : 1);
+    const rowRange = sheet.getRangeByIndexes(nextRowIndex, 0, 1, row.length);
+    rowRange.setValues([row]);
+
+    return { status: 'ok', columnas: header.length, nuevasColumnas: newCols.length };
+  } catch (err) {
+    return { status: 'error', message: String(err) };
+  }
+}

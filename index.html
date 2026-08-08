@@ -153,8 +153,9 @@ details.cbox .colname{font-size:12px;color:var(--muted);margin-top:6px;font-fami
    Este fichero es autónomo: funciona abriéndolo en local, sin dependencias.
    ========================================================================== */
 
-/* URL del Apps Script vinculado a la hoja de cálculo (acaba en /exec). */
-var APPS_SCRIPT_URL = '';
+/* URL del flujo de Power Automate que añade cada respuesta a answers_pilottact_sp.xlsx
+   (disparador «Cuando se recibe una solicitud HTTP»). Ver README.md para desplegarlo. */
+var RESPONSES_URL = '';
 
 /* ---------- utilidades ---------- */
 function pick(a){ return a[Math.floor(Math.random()*a.length)]; }
@@ -1881,8 +1882,8 @@ function renderEnd(){
   send.type = 'button';
   var status = el('div','qnote');
   send.onclick = function(){
-    if(!APPS_SCRIPT_URL){
-      status.innerHTML = '<b>No hay ninguna URL de recogida configurada.</b> Las respuestas no se han enviado. Rellena <code>APPS_SCRIPT_URL</code> en el HTML.';
+    if(!RESPONSES_URL){
+      status.innerHTML = '<b>No hay ninguna URL de recogida configurada.</b> Las respuestas no se han enviado. Rellena <code>RESPONSES_URL</code> en el HTML.';
       return;
     }
     send.disabled = true;
@@ -1893,10 +1894,10 @@ function renderEnd(){
       timestampClient: new Date().toISOString(),
       totalSeconds: totalSeconds()
     };
-    fetch(APPS_SCRIPT_URL, {method:'POST', mode:'no-cors', headers:{'Content-Type':'text/plain;charset=utf-8'}, body:JSON.stringify(payload)})
+    fetch(RESPONSES_URL, {method:'POST', mode:'no-cors', headers:{'Content-Type':'text/plain;charset=utf-8'}, body:JSON.stringify(payload)})
       .then(function(){
         S.sent = true;
-        status.innerHTML = 'Enviado. El navegador <b>no puede confirmar</b> la respuesta del servidor (envío sin CORS): comprueba la hoja de cálculo para verificar que la fila ha llegado.';
+        status.innerHTML = 'Enviado. El navegador <b>no puede confirmar</b> la respuesta del servidor (envío sin CORS): comprueba answers_pilottact_sp.xlsx para verificar que la fila ha llegado.';
       })
       .catch(function(e){
         send.disabled = false;

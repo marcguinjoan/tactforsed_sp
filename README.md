@@ -12,7 +12,8 @@ del trabajo de campo.
 | Fichero | Descripción |
 |---|---|
 | `index.html` | El simulador entero. Un solo fichero autónomo, sin dependencias: funciona abriéndolo en local. |
-| `Code.gs` | Receptor de Apps Script para la hoja de cálculo. Debe estar vinculado a la hoja. |
+| `ResponsesScript.osts` | Office Script que añade cada respuesta a `answers_pilottact_sp.xlsx`. Se ejecuta desde un flujo de Power Automate. |
+| `answers_pilottact_sp.xlsx` | **No está en el repositorio** (ver `.gitignore`): vive en esta misma carpeta de OneDrive y es donde caen las respuestas. |
 | `REVISIONES.md` | Divergencias detectadas entre el Word, los documentos de ética y el simulador. |
 
 ## Alcance
@@ -76,25 +77,42 @@ Cada pantalla tiene una caja de comentarios desplegable que indica el nombre de 
 donde acabará (`variable_comment`, justo a la derecha de la variable). En la pantalla final
 hay un repaso de todos los comentarios escritos, en orden del cuestionario.
 
-## Hoja de cálculo
+## Resultados en `answers_pilottact_sp.xlsx`
 
-1. Crear una hoja de Google nueva.
-2. Desde la hoja: **Extensiones → Apps Script**.
-3. Borrar todo lo que haya, incluido el `function myFunction() { }` por defecto, y pegar el
-   contenido de `Code.gs`. `doPost` y `doGet` deben quedar como funciones de primer nivel.
-4. Guardar.
-5. **Implementar → Nueva implementación → Aplicación web**, ejecutando como tú y con acceso
-   para **«Cualquier persona»** (no «Cualquier persona con cuenta de Google»: falla para
-   quien no tenga sesión iniciada).
-6. Autorizar (aviso de aplicación no verificada → Configuración avanzada → Ir a…).
-7. Copiar la URL que acaba en `/exec` y pegarla en `APPS_SCRIPT_URL`, al principio del
-   `<script>` de `index.html`.
+Las respuestas caen en la hoja **«Respuestas»** de `answers_pilottact_sp.xlsx`, en esta misma
+carpeta de OneDrive — ya tiene la cabecera fija escrita y está lista para recibir filas. No
+está en el repositorio (ver `.gitignore`): es un fichero de datos, no de código, y el
+repositorio es público.
 
-Si más adelante se toca `Code.gs`, no basta con guardar: **Gestionar implementaciones →
-editar → Versión: Nueva versión**. Crear una implementación nueva de cero cambia la URL.
+Como el simulador es una página estática en GitHub Pages, no puede escribir directamente en
+un fichero de OneDrive: hace falta un intermediario que reciba el envío y añada la fila. El
+equivalente de Microsoft a lo que hacía Apps Script con Google Sheets es un flujo de
+**Power Automate** con disparador HTTP que ejecuta el Office Script `ResponsesScript.osts`.
+
+1. En `answers_pilottact_sp.xlsx` (Excel Online, no la app de escritorio): pestaña
+   **Automatizar → Nuevo script**, borrar el contenido de ejemplo y pegar
+   `ResponsesScript.osts`. Guardar con un nombre reconocible (p. ej. «Añadir respuesta»).
+2. Ir a [make.powerautomate.com](https://make.powerautomate.com) → **Crear → Flujo de nube
+   instantáneo** → elegir el disparador **«Cuando se recibe una solicitud HTTP»** (no hace
+   falta definir un esquema JSON: se deja el cuerpo como texto).
+3. Añadir una acción **Excel Online (Business) → Ejecutar script**:
+   - Ubicación: OneDrive - UAB (o Business).
+   - Documento: `answers_pilottact_sp.xlsx` (buscarlo o pegar su ruta).
+   - Script: el que has guardado en el paso 1.
+   - Parámetro `payloadJson`: la expresión `triggerBody()` (el cuerpo tal cual llega).
+4. Guardar el flujo. Power Automate genera la **URL HTTP POST** del disparador: cópiala.
+5. Pega esa URL en `RESPONSES_URL`, al principio del `<script>` de `index.html`.
+
+Si más adelante se modifica `ResponsesScript.osts`, basta con guardar el script en Excel
+Online: el flujo llama siempre a la última versión guardada, no hace falta redesplegar nada
+(a diferencia de Apps Script). Si se borra el flujo y se crea uno nuevo, la URL cambia.
 
 El envío se hace con `mode:'no-cors'`, de modo que el navegador **no confirma** la respuesta
-del servidor. La pantalla final lo advierte: hay que comprobar la hoja.
+del servidor. La pantalla final lo advierte: hay que comprobar el Excel.
+
+**Aviso de cuenta:** el flujo y el script deben crearse con la cuenta de UAB que tiene acceso
+a esta carpeta de OneDrive; si `answers_pilottact_sp.xlsx` se comparte o se mueve de carpeta,
+el flujo puede dejar de encontrarlo y hay que reapuntarlo al fichero nuevo.
 
 ## Material sensible
 

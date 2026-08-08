@@ -13,6 +13,9 @@ Thumbs.db
 *.doc
 *.Rmd
 
+# Fichero de resultados: contiene (o contendrá) respuestas, no código
+answers_pilottact_sp.xlsx
+
 # Entornos y temporales
 .venv/
 __pycache__/

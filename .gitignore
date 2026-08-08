@@ -1,0 +1,19 @@
+# Windows / OneDrive
+desktop.ini
+Thumbs.db
+.DS_Store
+
+# Punteros de Google Drive (no son ficheros reales)
+*.gsheet
+*.gdoc
+*.gslides
+
+# El instrumento completo no va a un repositorio público
+*.docx
+*.doc
+*.Rmd
+
+# Entornos y temporales
+.venv/
+__pycache__/
+*.pyc

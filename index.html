@@ -1,0 +1,1930 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Simulador · Encuesta de Teorías políticas (TaCT-FoRSED · España)</title>
+<style>
+:root{
+  --bg:#f4f5f7; --card:#ffffff; --ink:#1b1d21; --muted:#6b7280; --line:#e2e5ea;
+  --accent:#1f4e79; --accent-soft:#e8f0f8; --warn:#8a5a00; --warn-soft:#fff6e0;
+  --ok:#1d6f42; --ok-soft:#e7f4ec; --danger:#9b2226;
+  --radius:10px; --maxw:820px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--bg); color:var(--ink);
+  font:16px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  padding:0 0 60px;
+}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:16px}
+header.top{
+  background:var(--accent); color:#fff; padding:10px 16px;
+  display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;
+}
+header.top .ttl{font-weight:600;font-size:15px}
+header.top .meta{font-size:13px;opacity:.85}
+.progress{height:4px;background:#d7dce3}
+.progress > div{height:100%;background:var(--accent);width:0;transition:width .25s}
+.card{
+  background:var(--card); border:1px solid var(--line); border-radius:var(--radius);
+  padding:22px; margin:16px 0; box-shadow:0 1px 2px rgba(0,0,0,.04);
+}
+.blocktag{
+  display:inline-block; font-size:11px; letter-spacing:.08em; text-transform:uppercase;
+  color:var(--muted); border:1px solid var(--line); border-radius:999px; padding:2px 10px; margin-bottom:12px;
+}
+h1{font-size:22px;margin:0 0 12px;line-height:1.3}
+h2{font-size:18px;margin:22px 0 8px;line-height:1.35}
+h3{font-size:16px;margin:18px 0 6px}
+.qtitle{font-size:18px;font-weight:600;margin:0 0 6px;line-height:1.4}
+.qnote{color:var(--muted);font-size:14px;margin:0 0 16px}
+p{margin:0 0 12px}
+.stim{background:var(--accent-soft);border-left:4px solid var(--accent);padding:16px 18px;border-radius:6px;margin:0 0 18px}
+.stim h3{margin-top:0}
+.doc{font-size:15px}
+.doc h3{font-size:15px;font-weight:700;margin:16px 0 4px}
+.doc a{color:var(--accent)}
+.opts{display:flex;flex-direction:column;gap:8px;margin:0 0 6px}
+.opt{
+  display:flex; align-items:flex-start; gap:10px; width:100%; text-align:left;
+  background:#fff; border:1px solid var(--line); border-radius:8px; padding:11px 14px;
+  font:inherit; color:inherit; cursor:pointer; transition:border-color .12s, background .12s;
+}
+.opt:hover{border-color:#b9c3cf;background:#fbfcfd}
+.opt.sel{border-color:var(--accent);background:var(--accent-soft);font-weight:600}
+.opt .bullet{
+  flex:0 0 18px;height:18px;margin-top:2px;border:1px solid #a9b3bf;border-radius:50%;background:#fff;
+}
+.opt.multi .bullet{border-radius:4px}
+.opt.sel .bullet{border-color:var(--accent);background:var(--accent);box-shadow:inset 0 0 0 3px #fff}
+.opt.multi.sel .bullet{box-shadow:inset 0 0 0 2px #fff}
+.subq{margin:0 0 22px}
+.subq .qtitle{font-size:16px}
+.slider-wrap{margin:8px 0 4px}
+.slider-val{
+  text-align:center;font-size:30px;font-weight:700;color:var(--accent);margin:6px 0 2px;line-height:1
+}
+.slider-val.empty{color:#b6bcc5}
+input[type=range]{width:100%;accent-color:var(--accent)}
+input[type=range].untouched{accent-color:#c2c8d0}
+.poles{display:flex;justify-content:space-between;gap:12px;color:var(--muted);font-size:13px;margin-top:2px}
+.poles span{max-width:45%}
+.poles span:last-child{text-align:right}
+.gridwrap{overflow-x:auto;margin:0 0 8px;border:1px solid var(--line);border-radius:8px}
+table.grid{border-collapse:collapse;width:100%;min-width:520px;font-size:14px}
+table.grid th,table.grid td{border-bottom:1px solid var(--line);padding:7px 8px;text-align:center}
+table.grid th{background:#f7f8fa;font-weight:600;font-size:12px;color:#40474f;position:sticky;top:0}
+table.grid th.itemcol,table.grid td.itemcol{text-align:left;min-width:230px;font-weight:400}
+table.grid tr:last-child td{border-bottom:none}
+table.grid td.cell{cursor:pointer}
+table.grid td.cell:hover{background:#f2f6fa}
+.dot{display:inline-block;width:18px;height:18px;border:1px solid #a9b3bf;border-radius:50%;background:#fff;vertical-align:middle}
+td.cell.sel .dot{border-color:var(--accent);background:var(--accent);box-shadow:inset 0 0 0 3px #fff}
+.polelegend{display:flex;justify-content:space-between;color:var(--muted);font-size:13px;margin:0 0 6px}
+.field{margin:0 0 14px}
+.field label{display:block;font-size:14px;margin-bottom:4px;color:#3a4149}
+select,input[type=text],input[type=number],textarea{
+  font:inherit;padding:9px 10px;border:1px solid var(--line);border-radius:8px;background:#fff;color:inherit;width:100%;max-width:420px;
+}
+textarea{max-width:100%;min-height:80px;resize:vertical}
+.err{color:var(--danger);font-size:14px;margin:6px 0 0}
+.btn-row{display:flex;gap:10px;align-items:center;margin-top:22px;flex-wrap:wrap}
+button.nav{
+  font:inherit;font-weight:600;padding:11px 22px;border-radius:8px;border:1px solid var(--accent);
+  background:var(--accent);color:#fff;cursor:pointer;
+}
+button.nav:hover{background:#1a4267}
+button.ghost{background:#fff;color:var(--accent)}
+button.ghost:hover{background:var(--accent-soft)}
+button.small{padding:6px 12px;font-size:13px;font-weight:500}
+details.cbox{margin-top:20px;border:1px dashed var(--line);border-radius:8px;padding:10px 14px;background:#fbfbfc}
+details.cbox summary{cursor:pointer;font-size:14px;color:var(--muted);font-weight:600}
+details.cbox[data-filled="1"] summary{color:var(--ok)}
+details.cbox .colname{font-size:12px;color:var(--muted);margin-top:6px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+.footlink{text-align:center;margin:18px 0 0}
+.footlink a{color:var(--muted);font-size:12px;text-decoration:none;border-bottom:1px dotted var(--muted)}
+.footlink a:hover{color:var(--accent)}
+/* --- portada --- */
+.hero{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:26px}
+.hero h1{font-size:24px}
+.lead{color:var(--muted);margin:0 0 18px}
+.assignbox{background:var(--warn-soft);border:1px solid #f0dfae;border-radius:8px;padding:14px 16px;margin:0 0 18px}
+.assignbox h3{margin:0 0 8px;font-size:14px;text-transform:uppercase;letter-spacing:.06em;color:var(--warn)}
+.assignbox ul{margin:0;padding-left:18px;font-size:14px}
+.assignbox code{background:#fff;border:1px solid #ecdcae;border-radius:4px;padding:1px 5px;font-size:13px}
+.tree{font-size:14px;margin:0 0 6px}
+.tree .node{display:flex;align-items:baseline;gap:8px;padding:4px 0;border-bottom:1px dotted var(--line)}
+.tree .node:last-child{border-bottom:none}
+.tree .rail{color:#b6bcc5;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;white-space:pre}
+.tree a.jump{color:var(--accent);text-decoration:none;font-weight:600}
+.tree a.jump:hover{text-decoration:underline}
+.tree .cond{color:var(--warn);font-size:13px}
+.tree .n{color:var(--muted);font-size:12px;margin-left:auto;white-space:nowrap}
+.tree .exp{background:var(--warn-soft)}
+.hint{font-size:13px;color:var(--muted)}
+.reviewlist{font-size:14px}
+.reviewlist .r{border-bottom:1px solid var(--line);padding:8px 0}
+.reviewlist .r:last-child{border-bottom:none}
+.reviewlist .k{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;color:var(--muted)}
+.ok{background:var(--ok-soft);border:1px solid #bfe0cc;border-radius:8px;padding:14px 16px}
+.warnbox{background:var(--warn-soft);border:1px solid #f0dfae;border-radius:8px;padding:14px 16px}
+@media(max-width:640px){
+  .card,.hero{padding:16px}
+  h1{font-size:20px}.qtitle{font-size:17px}
+  table.grid th.itemcol,table.grid td.itemcol{min-width:170px}
+}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="ttl">Simulador · Encuesta de Teorías políticas</div>
+  <div class="meta" id="topmeta">TaCT-FoRSED · UAB · España</div>
+</header>
+<div class="progress"><div id="pbar"></div></div>
+<div class="wrap" id="app"></div>
+
+<script>
+/* ==========================================================================
+   Simulador de la encuesta «Teorías políticas» (TaCT-FoRSED, UAB · España)
+   Fuente: 25005312CU0203-Teorías políticas MASTER - UAB.docx
+   Este fichero es autónomo: funciona abriéndolo en local, sin dependencias.
+   ========================================================================== */
+
+/* URL del Apps Script vinculado a la hoja de cálculo (acaba en /exec). */
+var APPS_SCRIPT_URL = '';
+
+/* ---------- utilidades ---------- */
+function pick(a){ return a[Math.floor(Math.random()*a.length)]; }
+function randInt(n){ return 1 + Math.floor(Math.random()*n); }
+function shuffle(a){
+  var b = a.slice();
+  for(var i=b.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=b[i]; b[i]=b[j]; b[j]=t; }
+  return b;
+}
+function mdToHtml(str){ return (str||'').replace(/\*\*(.+?)\*\*/g,'<b>$1</b>'); }
+function lcFirst(s){ return s ? s.charAt(0).toLowerCase()+s.slice(1) : s; }
+function el(tag, cls, html){
+  var n = document.createElement(tag);
+  if(cls) n.className = cls;
+  if(html != null) n.innerHTML = html;
+  return n;
+}
+function range(a,b){ var r=[]; for(var i=a;i<=b;i++) r.push(i); return r; }
+function numOpts(a,b){ return range(a,b).map(function(i){ return {code:i, label:String(i)}; }); }
+
+/* ==========================================================================
+   1. DATOS DEL CUESTIONARIO
+   ========================================================================== */
+
+var PROVINCIAS = [
+  ['Araba/Álava',21],['Albacete',42],['Alicante/Alacant',52],['Almería',61],['Asturias',12],
+  ['Ávila',41],['Badajoz',43],['Illes Balears',53],['Barcelona',51],['Bizkaia',21],
+  ['Burgos',41],['Cáceres',43],['Cádiz',61],['Cantabria',13],['Castellón/Castelló',52],
+  ['Ceuta',63],['Ciudad Real',42],['Córdoba',61],['A Coruña',11],['Cuenca',42],
+  ['Girona',51],['Granada',61],['Guadalajara',42],['Gipuzkoa',21],['Huelva',61],
+  ['Huesca',24],['Jaén',61],['León',41],['Lleida',51],['Lugo',11],
+  ['Madrid',30],['Málaga',61],['Melilla',64],['Murcia',62],['Navarra',22],
+  ['Ourense',11],['Palencia',41],['Las Palmas',70],['Pontevedra',11],['La Rioja',23],
+  ['Salamanca',41],['Santa Cruz de Tenerife',70],['Segovia',41],['Sevilla',61],['Soria',41],
+  ['Tarragona',51],['Teruel',24],['Toledo',42],['Valencia/València',52],['Valladolid',41],
+  ['Zamora',41],['Zaragoza',24]
+];
+var REGION_NAMES = {
+  11:'Galicia',12:'Principado de Asturias',13:'Cantabria',21:'País Vasco',
+  22:'Comunidad Foral de Navarra',23:'La Rioja',24:'Aragón',30:'Comunidad de Madrid',
+  41:'Castilla y León',42:'Castilla-La Mancha',43:'Extremadura',51:'Catalunya',
+  52:'Comunitat Valenciana',53:'Illes Balears',61:'Andalucía',62:'Región de Murcia',
+  63:'Ciudad Autónoma de Ceuta',64:'Ciudad Autónoma de Melilla',70:'Canarias'
+};
+
+/* Lista de países. El instrumento real usa «Lista_195_paises_UAB» con los códigos
+   internos de Ipsos; aquí se numeran secuencialmente con España en primer lugar. */
+var PAISES = ['España',
+'Afganistán','Albania','Alemania','Andorra','Angola','Antigua y Barbuda','Arabia Saudí','Argelia','Argentina','Armenia',
+'Australia','Austria','Azerbaiyán','Bahamas','Bangladés','Barbados','Baréin','Bélgica','Belice','Benín',
+'Bielorrusia','Bolivia','Bosnia y Herzegovina','Botsuana','Brasil','Brunéi','Bulgaria','Burkina Faso','Burundi','Bután',
+'Cabo Verde','Camboya','Camerún','Canadá','Catar','Chad','Chequia','Chile','China','Chipre',
+'Colombia','Comoras','Corea del Norte','Corea del Sur','Costa de Marfil','Costa Rica','Croacia','Cuba','Dinamarca','Dominica',
+'Ecuador','Egipto','El Salvador','Emiratos Árabes Unidos','Eritrea','Eslovaquia','Eslovenia','Estados Unidos','Estonia','Esuatini',
+'Etiopía','Filipinas','Finlandia','Fiyi','Francia','Gabón','Gambia','Georgia','Ghana','Granada',
+'Grecia','Guatemala','Guinea','Guinea-Bisáu','Guinea Ecuatorial','Guyana','Haití','Honduras','Hungría','India',
+'Indonesia','Irak','Irán','Irlanda','Islandia','Islas Marshall','Islas Salomón','Israel','Italia','Jamaica',
+'Japón','Jordania','Kazajistán','Kenia','Kirguistán','Kiribati','Kuwait','Laos','Lesoto','Letonia',
+'Líbano','Liberia','Libia','Liechtenstein','Lituania','Luxemburgo','Macedonia del Norte','Madagascar','Malasia','Malaui',
+'Maldivas','Malí','Malta','Marruecos','Mauricio','Mauritania','México','Micronesia','Moldavia','Mónaco',
+'Mongolia','Montenegro','Mozambique','Myanmar','Namibia','Nauru','Nepal','Nicaragua','Níger','Nigeria',
+'Noruega','Nueva Zelanda','Omán','Países Bajos','Pakistán','Palaos','Panamá','Papúa Nueva Guinea','Paraguay','Perú',
+'Polonia','Portugal','Reino Unido','República Centroafricana','República del Congo','República Democrática del Congo','República Dominicana','Ruanda','Rumanía','Rusia',
+'Samoa','San Cristóbal y Nieves','San Marino','San Vicente y las Granadinas','Santa Lucía','Santo Tomé y Príncipe','Senegal','Serbia','Seychelles','Sierra Leona',
+'Singapur','Siria','Somalia','Sri Lanka','Sudáfrica','Sudán','Sudán del Sur','Suecia','Suiza','Surinam',
+'Tailandia','Tanzania','Tayikistán','Timor Oriental','Togo','Tonga','Trinidad y Tobago','Túnez','Turkmenistán','Turquía',
+'Tuvalu','Ucrania','Uganda','Uruguay','Uzbekistán','Vanuatu','Vaticano','Venezuela','Vietnam','Yemen',
+'Yibuti','Zambia','Zimbabue'];
+
+var PARTIDOS_ES = [
+  {code:1,label:'Partido Popular (PP)'},
+  {code:2,label:'Partido Socialista Obrero Español (PSOE)'},
+  {code:3,label:'Vox'},
+  {code:4,label:'Sumar'},
+  {code:5,label:'Esquerra Republicana de Catalunya (ERC)'},
+  {code:6,label:'Junts per Catalunya'},
+  {code:7,label:'Euskal Herria Bildu'},
+  {code:8,label:'Euzko Alderdi Jeltzalea / Partido Nacionalista Vasco (EAJ/PNV)'},
+  {code:9,label:'Compromís'},
+  {code:10,label:'Bloque Nacionalista Galego (BNG)'},
+  {code:11,label:'Coalición Canaria (CC)'},
+  {code:12,label:'Partido Animalista Con el Medio Ambiente (PACMA)'},
+  {code:13,label:"Candidatura d'Unitat Popular - Per la Ruptura (CUP-PR)"},
+  {code:16,label:'Otro'},
+  {code:99,label:'Prefiero no contestar'}
+];
+
+var INCOME_ES = [
+  {code:1,label:'Hasta 12.500 EUR'},
+  {code:2,label:'Más de 12.500 y hasta 17.500 EUR'},
+  {code:3,label:'Más de 17.500 y hasta 22.500 EUR'},
+  {code:4,label:'Más de 22.500 y hasta 28.000 EUR'},
+  {code:5,label:'Más de 28.000 y hasta 33.500 EUR'},
+  {code:6,label:'Más de 33.500 y hasta 39.000 EUR'},
+  {code:7,label:'Más de 39.000 y hasta 46.500 EUR'},
+  {code:8,label:'Más de 46.500 y hasta 56.000 EUR'},
+  {code:9,label:'Más de 56.000 y hasta 72.000 EUR'},
+  {code:10,label:'Más de 72.000 EUR'},
+  {code:98,label:'No lo sé'},
+  {code:99,label:'Prefiero no responder'}
+];
+
+/* --- escalas reutilizadas --- */
+var LIK5 = [
+  {code:1,label:'1- Totalmente en desacuerdo'},{code:2,label:'2- En desacuerdo'},
+  {code:3,label:'3- Ni de acuerdo ni en desacuerdo'},{code:4,label:'4- De acuerdo'},
+  {code:5,label:'5- Totalmente de acuerdo'}
+];
+var LIK7 = [
+  {code:1,label:'1- Totalmente en desacuerdo'},{code:2,label:'2- Bastante en desacuerdo'},
+  {code:3,label:'3- Un poco en desacuerdo'},{code:4,label:'4- Ni de acuerdo ni en desacuerdo'},
+  {code:5,label:'5- Un poco de acuerdo'},{code:6,label:'6- Bastante de acuerdo'},
+  {code:7,label:'7- Totalmente de acuerdo'}
+];
+var LIK5_POP = [
+  {code:1,label:'Totalmente en desacuerdo'},{code:2,label:'En desacuerdo'},
+  {code:3,label:'Ni de acuerdo ni en desacuerdo'},{code:4,label:'De acuerdo'},
+  {code:5,label:'Totalmente de acuerdo'}
+];
+var LIK7_EU = [
+  {code:1,label:'Totalmente en desacuerdo'},{code:2,label:'Bastante en desacuerdo'},
+  {code:3,label:'Un poco en desacuerdo'},{code:4,label:'Ni de acuerdo ni en desacuerdo'},
+  {code:5,label:'Un poco de acuerdo'},{code:6,label:'Bastante de acuerdo'},
+  {code:7,label:'Totalmente de acuerdo'}
+];
+var SCALE011 = numOpts(0,10);
+
+/* --- baterías (orden canónico del Word) --- */
+var ITEMS = {
+  discrim_reasons:[
+    {key:'discrim_race',label:'Color de piel'},
+    {key:'discrim_national',label:'Nacionalidad'},
+    {key:'discrim_pol',label:'Ideología política'},
+    {key:'discrim_beliefs',label:'Creencias no convencionales o heterodoxas'},
+    {key:'discrim_religion',label:'Religión'},
+    {key:'discrim_language',label:'Lengua'},
+    {key:'discrim_ethnic',label:'Grupo étnico'},
+    {key:'discrim_age',label:'Edad'},
+    {key:'discrim_gender',label:'Género'},
+    {key:'discrim_sex',label:'Sexualidad'},
+    {key:'discrim_disability',label:'Discapacidad'},
+    {key:'discrim_other',label:'Otra. ¿Cuál?',fixed:true,text:true}
+  ],
+  pol_soph:[
+    {key:'pol_soph_1',label:'La política es tan compleja que la gente como yo no puede entender lo que está pasando'},
+    {key:'pol_soph_2',label:'Creo que estoy tan bien informado/a sobre política como la mayoría de la gente'}
+  ],
+  auth:[
+    {key:'auth_1',label:'En algunas circunstancias, un gobierno autoritario es preferible.'},
+    {key:'auth_2',label:'La democracia puede tener problemas, pero es mejor que cualquier otra forma de gobierno.'}
+  ],
+  nat_pride:[
+    {key:'nat_pride_reg',label:'De tu región'},
+    {key:'nat_pride_country',label:'Español/a'}
+  ],
+  values:[
+    {key:'values_gay',label:'Las parejas gais y lesbianas deberían tener los mismos derechos que las parejas heterosexuales para adoptar niños/as'},
+    {key:'values_gender',label:'Reducir la desigualdad entre hombres y mujeres es necesario para construir una sociedad más justa'},
+    {key:'values_redist',label:'El gobierno debería tomar medidas para reducir las diferencias de ingresos'}
+  ],
+  partip:[
+    {key:'partip_1',label:'Participar en una manifestación'},
+    {key:'partip_2',label:'Comprar o dejar de comprar ciertos productos por razones políticas, éticas o medioambientales'},
+    {key:'partip_3',label:'Publicar o compartir algo sobre política en internet, por ejemplo, en redes sociales'},
+    {key:'partip_4',label:'Hacer un voluntariado en una organización sin ánimo de lucro'},
+    {key:'partip_5',label:'Contactar con un/a político/a o con una autoridad pública'},
+    {key:'partip_6',label:'Donar o participar en actividades de un partido político o grupo de presión'},
+    {key:'partip_7',label:'Firmar una petición'},
+    {key:'partip_8',label:'Participar en una huelga'}
+  ],
+  inst_trust:[
+    {key:'trust_parlmt',label:'El parlamento'},
+    {key:'trust_gov',label:'El gobierno'},
+    {key:'trust_pol',label:'Los políticos'},
+    {key:'trust_judicial',label:'El sistema judicial'},
+    {key:'trust_media',label:'Los medios de comunicación'},
+    {key:'trust_science',label:'Los científicos'},
+    {key:'trust_banks',label:'Los bancos'},
+    {key:'trust_ngo',label:'Las organizaciones no gubernamentales (ONG)'},
+    {key:'trust_pharma',label:'La industria farmacéutica'},
+    {key:'trust_police',label:'Las fuerzas de seguridad del Estado'}
+  ],
+  sympathy:[
+    {key:'sympathy_far_right',label:'Los/las activistas de extrema derecha'},
+    {key:'sympathy_far_left',label:'Los/las activistas de extrema izquierda'},
+    {key:'sympathy_gay',label:'Las personas homosexuales'},
+    {key:'sympathy_jewish',label:'Las personas judías'},
+    {key:'sympathy_muslim',label:'Las personas musulmanas'},
+    {key:'sympathy_black',label:'Las personas negras'},
+    {key:'sympathy_immig',label:'Las personas inmigrantes'},
+    {key:'sympathy_feminist',label:'Las personas feministas'}
+  ],
+  intol:[
+    {key:'intol_protest',label:'Creo que no se debería permitir que {G} se manifiesten'},
+    {key:'intol_media',label:'Creo que no se debería permitir que {G} expresen libremente sus opiniones en los medios de comunicación'},
+    {key:'intol_parlmt',label:'Creo que se debería prohibir que {G} elijan representantes en el parlamento'}
+  ],
+  cmq:[
+    {key:'cmq1',label:'Suceden muchas cosas importantes en el mundo de las que el público nunca es informado'},
+    {key:'cmq2',label:'Los políticos normalmente no nos dicen los verdaderos motivos de sus decisiones'},
+    {key:'cmq3',label:'Las agencias gubernamentales vigilan de cerca a todos los ciudadanos'},
+    {key:'cmq4',label:'Los eventos que superficialmente parecen no tener conexión son a menudo el resultado de actividades secretas'},
+    {key:'cmq5',label:'Existen organizaciones secretas que influyen de manera decisiva en las decisiones políticas'}
+  ],
+  gcbs:[
+    {key:'gcbs1',label:'El gobierno permite o perpetra actos de terrorismo en su propio territorio, ocultando su implicación'},
+    {key:'gcbs2',label:'Las pruebas sobre el contacto con seres extraterrestres están siendo ocultadas al público'},
+    {key:'gcbs3',label:'Tecnologías nuevas y avanzadas que perjudicarían a las industrias actuales están siendo suprimidas'},
+    {key:'gcbs4',label:'Ciertos eventos significativos han sido resultado de la actividad de un pequeño grupo que manipula en secreto los asuntos mundiales'},
+    {key:'gcbs5',label:'Experimentos con nuevos fármacos o tecnologías se llevan a cabo rutinariamente sobre la población sin su conocimiento ni consentimiento'}
+  ],
+  consp_bel:[
+    {key:'cb_gen',label:'La versión oficial de los hechos que dan las autoridades muy a menudo oculta la verdad'},
+    {key:'cb_spec',label:'Las élites globales están promoviendo activamente la inmigración masiva para sustituir a la población nativa'}
+  ],
+  psych:[
+    {key:'psych_intuition',label:'Cuando tengo que tomar decisiones, tiendo a confiar en mi intuición'},
+    {key:'psych_manichean',label:'No hay término medio entre lo que es verdadero y lo que es falso'},
+    {key:'psych_battle',label:'En última instancia, la política es una batalla entre el bien y el mal'},
+    {key:'psych_avoid_think',label:'Intento evitar situaciones que me obligan a pensar en profundidad'},
+    {key:'psych_change_mind',label:'No tengo dificultad para cambiar de opinión cuando se me presentan razones convincentes'},
+    {key:'psych_superstit',label:'Ciertas acciones, como pasar por debajo de una escalera, pueden atraer la mala suerte'},
+    {key:'psych_challenge',label:'Disfruto cuestionando las opiniones de otras personas'},
+    {key:'psych_disagree',label:'Me siento mal después de un desacuerdo'},
+    {key:'psych_destroy',label:'No podemos arreglar los problemas de nuestras instituciones sociales; tenemos que derribarlas y empezar de nuevo'}
+  ],
+  media_freq:[
+    {key:'media_tv',label:'Televisión'},
+    {key:'media_radio',label:'Radio'},
+    {key:'media_print',label:'Diarios'},
+    {key:'media_social',label:'Redes Sociales'}
+  ],
+  media_rel:[
+    {key:'mrel_trad',label:'Medios de comunicación tradicionales'},
+    {key:'mrel_podcast',label:'Podcasts'},
+    {key:'mrel_facebook',label:'Facebook'},
+    {key:'mrel_whatsapp',label:'WhatsApp'},
+    {key:'mrel_youtube',label:'YouTube'},
+    {key:'mrel_twitter',label:'X (Twitter)'},
+    {key:'mrel_tiktok',label:'TikTok'},
+    {key:'mrel_telegram',label:'Telegram'},
+    {key:'mrel_forums',label:'Foros (e.g., Reddit)'}
+  ],
+  sm_use:[
+    {key:'sm_tiktok',label:'TikTok'},
+    {key:'sm_instagram',label:'Instagram'},
+    {key:'sm_facebook',label:'Facebook'},
+    {key:'sm_twitter',label:'X (Twitter)'},
+    {key:'sm_youtube',label:'YouTube'},
+    {key:'sm_telegram',label:'Telegram'},
+    {key:'sm_forums',label:'Foros (e.g., Reddit)'}
+  ],
+  emo_traits:[
+    {key:'emo_anger',label:'Enfado'},
+    {key:'emo_anxiety',label:'Ansiedad'},
+    {key:'emo_pride',label:'Orgullo'}
+  ],
+  pop:[
+    {key:'pop_experts',label:'La política funcionaría mejor si las decisiones políticas se dejaran en manos de expertos en sus respectivos campos'},
+    {key:'pop_people',label:'El pueblo, y no los políticos, debería tomar las decisiones políticas más importantes'},
+    {key:'pop_cynicism',label:'A la mayoría de los políticos no les importa la ciudadanía'},
+    {key:'pop_manichean',label:'La política es, en última instancia, una lucha entre el bien y el mal'},
+    {key:'pop_dem_pref',label:'La democracia puede tener problemas, pero es mejor que cualquier otra forma de gobierno'}
+  ],
+  manip_traits:[
+    {key:'manip_intention',label:'En este texto, el descenso del nivel educativo se presenta como el resultado de decisiones deliberadas, no como algo accidental'},
+    {key:'manip_elites',label:'En este texto, hay élites poderosas que actúan de forma encubierta para degradar la educación'},
+    {key:'manip_informed',label:'En este texto solo una parte de la población es capaz de comprender lo que realmente está ocurriendo'}
+  ],
+  eu_att:[
+    {key:'eu_interest',label:'La Unión Europea actúa en beneficio de sus ciudadanos'},
+    {key:'eu_transp',label:'El proceso de toma de decisiones en la Unión Europea es transparente'}
+  ],
+  local:[
+    {key:'local_11m',label:'Los autores detrás del ataque terrorista del 2004 en Madrid (11M) pertenecían a ETA'},
+    {key:'local_alcasser',label:'Las niñas de Alcàsser fueron víctimas de una red de abuso de la que formaban parte empresarios y políticos'},
+    {key:'local_gurtel',label:'Varias muertes relacionadas con la trama Gürtel (Miguel Blesa, Rita Barberá, etc.) fueron asesinatos encubiertos.'}
+  ],
+  dark_triad:[
+    {key:'dark_1',label:'Es emocionalmente estable y no se altera fácilmente'},
+    {key:'dark_2',label:'Disfruta siendo el centro de atención y recibiendo admiración de los demás'},
+    {key:'dark_3',label:'Rara vez se siente culpable o arrepentido/a, incluso cuando sus acciones hacen daño a otras personas'},
+    {key:'dark_4',label:'Está dispuesto/a a engañar a otras personas si eso le ayuda a conseguir lo que quiere'}
+  ],
+  trauma:[
+    {key:'trauma_1',label:'Un accidente grave o un incendio'},
+    {key:'trauma_2',label:'Una agresión o abuso físico o sexual'},
+    {key:'trauma_3',label:'Un terremoto o una inundación'},
+    {key:'trauma_4',label:'Una guerra'},
+    {key:'trauma_5',label:'Presenciar la muerte o lesión grave de otra persona'},
+    {key:'trauma_6',label:'La muerte de una persona cercana por homicidio o suicidio'},
+    {key:'trauma_99',label:'Ninguna de las anteriores',fixed:true,exclusive:true}
+  ],
+  styles:[
+    {key:'style_meat',label:'Consume carne o pescado'},
+    {key:'style_animal',label:'Consume otros productos de origen animal (leche, queso, yogur, huevos o miel)'},
+    {key:'style_alcohol',label:'Consume bebidas alcohólicas'},
+    {key:'style_gym',label:'Va al gimnasio o a un centro deportivo'},
+    {key:'style_exercise',label:'Realiza ejercicio físico intenso (correr, pesas, nadar...)'},
+    {key:'style_book',label:'Lee libros por placer'},
+    {key:'style_cinema',label:'Va al cine'},
+    {key:'style_concert',label:'Asiste a conciertos o festivales de música'},
+    {key:'style_car',label:'Usa un coche o una moto privado'},
+    {key:'style_bike',label:'Usa la bicicleta como medio de transporte'}
+  ],
+  items_spain:[
+    {key:'item_1',label:'Cuando te tragas un chicle, este tarda 7 años en digerirse'},
+    {key:'item_2',label:'Las estelas blancas de los aviones (chemtrails) son químicos utilizados para manipular el clima'},
+    {key:'item_3',label:'Una élite global liberó el virus de la COVID-19 para reducir la población'},
+    {key:'item_4',label:'Bañarse o ducharse justo después de comer es peligroso'},
+    {key:'item_5',label:'En días de luna llena nacen más bebés'},
+    {key:'item_6',label:'La vitamina C cura el resfriado'},
+    {key:'item_7',label:'Dejar el cargador enchufado sin el móvil consume mucha energía'},
+    {key:'item_8',label:'El cabello crece más fuerte si se corta con frecuencia'},
+    {key:'item_9',label:'El lado oscuro de la Luna está siempre en oscuridad'},
+    {key:'item_10',label:'La Estrella Polar se ve desde cualquier punto del planeta'},
+    {key:'item_11',label:'Los seres humanos sólo usamos el 10% de nuestro cerebro'},
+    {key:'item_12',label:'La Gran Muralla China es visible desde el espacio a simple vista'},
+    {key:'item_13',label:'Hay que esperar 24 horas antes de denunciar la desaparición de una persona'},
+    {key:'item_14',label:'Los murciélagos son ciegos'},
+    {key:'item_15',label:'El azúcar es el factor más importante en el desarrollo de la diabetes'},
+    {key:'item_16',label:'Sentarse cerca de la TV daña la vista'},
+    {key:'item_17',label:'Los seres humanos tenemos 5 sentidos'},
+    {key:'item_18',label:'Es posible comunicarse con los muertos a través del espiritismo'},
+    {key:'item_19',label:'Algunas acciones (como pasar bajo una escalera o abrir un paraguas dentro de casa) atraen la mala suerte'},
+    {key:'item_20',label:'El signo del zodíaco determina el carácter de las personas'},
+    {key:'item_21',label:'Llevar un amuleto ayuda a tener mejor suerte'},
+    {key:'item_22',label:'Algunos lugares o personas producen energías negativas'},
+    {key:'item_23',label:'Crujirse los nudillos causa artritis'},
+    {key:'item_24',label:'Los perros ven en blanco y negro'},
+    {key:'item_25',label:'Los rayos nunca caen dos veces en el mismo sitio'},
+    {key:'item_26',label:'Despertar a un sonámbulo es peligroso'},
+    {key:'item_27',label:'El agua del váter gira en sentido contrario en el hemisferio sur'},
+    {key:'item_28',label:'Los camaleones cambian de color para camuflarse'},
+    {key:'item_29',label:'Algunas especies de animales y plantas se han extinguido para siempre'},
+    {key:'item_30',label:'La especie humana ha evolucionado a partir de otras especies'},
+    {key:'item_31',label:'Estamos comprobando su atención. Seleccione «sí»'}
+  ]
+};
+
+/* baterías con orden de filas aleatorio */
+var RANDOM_ROWS = ['discrim_reasons','partip','intol','psych','media_rel','sm_use',
+                   'pop','manip_traits','items_spain','local','dark_triad','styles'];
+
+/* --- trade-offs --- */
+var TRADEOFFS = [
+  {code:'tradeoff_speech',
+   p1:'La protección de la libertad de expresión debe ser prioritaria, aunque ofenda a algunas personas o grupos',
+   p7:'Evitar ofender a personas o minorías debe ser prioritario, aunque implique restringir la libertad de expresión'},
+  {code:'tradeoff_security',
+   p1:'Una democracia debe garantizar las libertades individuales, aunque esto aumente los riesgos para la seguridad',
+   p7:'Una democracia debe garantizar la seguridad, aunque esto requiera restringir las libertades individuales'},
+  {code:'tradeoff_repres',
+   p1:'Las decisiones más importantes deben ser tomadas por los representantes elegidos, aunque esto signifique menos participación ciudadana directa (referéndums)',
+   p7:'Las decisiones más importantes deben ser tomadas directamente por los ciudadanos (referéndums), aunque esto signifique saltarse a los representantes elegidos'},
+  {code:'tradeoff_divers',
+   p1:'Una democracia debe permitir todas las expresiones de opiniones y/o estilos de vida, aunque esto genere división social',
+   p7:'Una democracia debe garantizar la cohesión social, aunque esto limite la expresión de algunas opiniones y/o estilos de vida'},
+  {code:'tradeoff_majority',
+   p1:'La voluntad de la mayoría debe prevalecer, aunque esto suponga ir en contra de los derechos de las minorías',
+   p7:'La protección de las minorías debe prevalecer, aunque esto suponga ir en contra de la voluntad de la mayoría'},
+  {code:'tradeoff_intl',
+   p1:'En una democracia se deben priorizar la cooperación internacional y los compromisos globales, aunque esto suponga ceder en los intereses nacionales',
+   p7:'En una democracia se deben priorizar los intereses nacionales, aunque esto contradiga los compromisos globales y la cooperación internacional'}
+];
+
+/* --- experimento 1: listas --- */
+var LIST1 = [
+  'El cabello crece más fuerte si se corta con frecuencia',
+  'Dejar el cargador enchufado sin el móvil consume muchísima energía',
+  'La Gran Muralla China es visible desde el espacio a simple vista',
+  'En días de luna llena nacen más bebés'
+];
+var LIST2 = [
+  'El Lado Oscuro de la Luna está siempre en oscuridad',
+  'Los murciélagos son ciegos',
+  'La vitamina C cura el resfriado',
+  'La Estrella Polar puede verse desde cualquier punto del planeta Tierra'
+];
+var SENSITIVE = {
+  A:'Las estelas blancas de los aviones (chemtrails) son químicos utilizados para manipular el clima.',
+  B:'Una élite global liberó el virus de la COVID-19 para reducir la población.'
+};
+/* Texto de la pregunta directa. Corregido respecto del Word: el ítem debe coincidir
+   con el visto en la lista (Rama A = chemtrails, Rama B = COVID-19). */
+var DIRECTQ_TEXT = {
+  A:'Las estelas blancas de los aviones (chemtrails) son químicos utilizados para manipular el clima',
+  B:'Una élite global liberó el virus de la COVID-19 para reducir la población'
+};
+
+/* --- experimento 2: traits --- */
+var TR_BASE = 'Evidencia internacional reciente apunta a un **descenso de los estándares educativos** en occidente. El rendimiento medio del alumnado **ha caído en comparación con generaciones anteriores** lo que demuestra ahora un peor dominio de competencias básicas como comprensión lectora, matemáticas y ciencias. Esto pone de relieve una **pérdida de conocimientos** adquiridos durante la etapa escolar.';
+var TR_INT = 'Esta tendencia descendente **no es casual**. Por el contrario, responde a un **plan intencionado**.';
+var TR_ELI = '**Una élite con enorme poder es la responsable de este declive,** ejerciendo su influencia en secreto para **rebajar los estándares educativos**.';
+var TR_NAR = 'Frente a esto, una minoría de **ciudadanos despiertos** se ha dado cuenta de lo que **está ocurriendo**, mientras la mayoría permanece sin entender lo que hay detrás de este fenómeno.';
+var TR_PURE = 'En los últimos años, los sistemas educativos de distintos países del mundo han introducido nuevas tecnologías en las aulas. Entre ellas se incluyen dispositivos digitales como ordenadores portátiles, tabletas y pizarras digitales interactivas que el profesorado utiliza cada vez más. Los educadores sostienen que estas herramientas digitales hacen el aprendizaje más interactivo y mejoran el acceso a la información. Estas innovaciones pueden contribuir a una mejor preparación de los estudiantes en un mercado laboral en evolución.';
+
+var TRAITS = {
+  1:{name:'pure_traits',       title:'Nuevas tecnologías en las aulas', paras:[TR_PURE]},
+  2:{name:'active_traits',     title:'El nivel educativo cae de forma generalizada', paras:[TR_BASE]},
+  3:{name:'intention_traits',  title:'El nivel educativo está siendo deliberadamente reducido', paras:[TR_BASE,TR_INT]},
+  4:{name:'elites_traits',     title:'Una élite poderosa está causando un descenso del nivel educativo', paras:[TR_BASE,TR_ELI]},
+  5:{name:'narcissism_traits', title:'Algunos ciudadanos despiertos ven lo que hay detrás del descenso del nivel educativo', paras:[TR_BASE,TR_NAR]},
+  6:{name:'intention_elites_traits', title:'Una élite poderosa está causando un descenso deliberado del nivel educativo', paras:[TR_BASE,TR_INT,TR_ELI]},
+  7:{name:'intention_narcissism_traits', title:'Algunos ciudadanos despiertos ven lo que hay detrás del descenso deliberado del nivel educativo', paras:[TR_BASE,TR_INT,TR_NAR]},
+  8:{name:'elites_narcissism_traits', title:'Algunos ciudadanos despiertos descubren que una élite está causando un descenso del nivel educativo', paras:[TR_BASE,TR_ELI,TR_NAR]},
+  9:{name:'full_traits',       title:'Algunos ciudadanos despiertos descubren que una élite está causando un descenso deliberado del nivel educativo', paras:[TR_BASE,TR_INT,TR_ELI,TR_NAR]}
+};
+
+/* --- experimento 3: debunk / prebunk --- */
+var KALERGI = {
+  title:'El Plan Kalergi',
+  paras:[
+    'En la década de 1920, Richard von Coudenhove-Kalergi, un intelectual que publicó el manifiesto Pan-Europa, formuló un proyecto a largo plazo que más tarde fue adoptado por una poderosa élite que creó la Unión Europea (UE). El objetivo de este proyecto era debilitar las identidades nacionales, transformando su población mediante inmigración procedente de otras regiones del mundo.',
+    'Las actuales políticas de migración y asilo de la UE son el resultado de la aplicación de esta estrategia demográfica. Las instituciones de la UE ocultan deliberadamente este objetivo mediante marcos jurídicos complejos, impulsando un cambio poblacional sin que la ciudadanía se dé cuenta.'
+  ]
+};
+var TXT_SENDERISMO_1 = 'Según sugieren algunas investigaciones, hacer senderismo aporta beneficios que van más allá de los que se obtienen con el ejercicio físico habitual. No solo oxigena el corazón, sino que también ayuda a mantener la mente más ágil, el cuerpo más relajado, la creatividad más viva y las relaciones más fructíferas. Caminar por la naturaleza es tan beneficioso para la salud y el bienestar que algunos médicos han empezado a recetarlo.';
+var TXT_SENDERISMO_2 = 'El senderismo también implica el moverse por un entorno que no es totalmente predecible. El suelo resbaladizo, las ramas que cuelgan, los obstáculos ocultos, las señales del camino y los animales que pueden cruzarse en tu ruta exigen pequeños y grandes ajustes en el recorrido, algo que resulta beneficioso para el cerebro.';
+var TXT_FACTCHECK = 'En la Unión Europea la toma de decisiones no tiene lugar a puerta cerrada, sino que en ella intervienen múltiples instituciones y está sujeta a escrutinio por parte de distintos actores. Además, el Parlamento Europeo es elegido por la ciudadanía, la Comisión Europea es aprobada a través de procedimientos parlamentarios y el Consejo de la UE representa a los gobiernos nacionales. Con tantos controles e intereses cruzados, un complot demográfico sería extraordinariamente difícil de concebir y llevar a cabo. Asimismo, los registros históricos muestran que Richard Nikolaus Eijiro no desempeñó ningún papel en la fundación de la UE, lo que desmiente directamente esta narrativa.';
+var TXT_WARNING = 'Algunos grupos con motivaciones políticas están utilizando tácticas engañosas para generar desconfianza hacia las instituciones democráticas. Lo hacen sirviéndose de trampas narrativas sobre hechos complejos, presentándolos como si tuvieran su origen en planes malintencionados. Una de esas trampas narrativas es la falacia del resultado: asumir que, porque ciertas políticas generan ciertos efectos inesperados (por ejemplo, el aumento de la inmigración en la Unión Europea), debe existir un grupo secreto que ha planificado ese resultado. Por ejemplo, una de estas narrativas dice que escritos de Richard Nikolaus Eijiro en la década de 1920 se utilizan actualmente como una guía de la política de la UE y que las leyes contienen cláusulas diseñadas para provocar un cambio demográfico.';
+
+var DEBUNK = {
+  1:{name:'placebo_debunk', title:'Por qué el senderismo es bueno para la salud',
+     paras:['Según sugieren algunas investigaciones, hacer senderismo aporta beneficios que van más allá de los que se obtienen con el ejercicio físico habitual. No solo oxigena el corazón, sino que también ayuda a mantener la mente más ágil, el cuerpo más relajado, la creatividad más viva y las relaciones más fructíferas. Caminar por la naturaleza es tan beneficioso para la salud y el bienestar que algunos médicos han empezado a recetarlo. El senderismo también implica el moverse por un entorno que no es totalmente predecible, lo que exige ajustes constantes que resultan beneficiosos para el cerebro.']},
+  2:{name:'factcheck_debunk', title:'El proceso legislativo de la UE', paras:[TXT_FACTCHECK]},
+  3:{name:'descriptive_debunk', title:'Resultados de una encuesta europea multinacional',
+     paras:['Encuestas representativas realizadas en distintos países europeos muestran que alrededor del 75% de la población considera falso que la Unión Europea fuese deliberadamente creada para “diluir” a las poblaciones europeas mediante la inmigración. Además, este resultado es similar en distintos países, lo que sugiere que una amplia mayoría de la ciudadanía europea no cree en este tipo de afirmaciones.']},
+  4:{name:'injunctive_debunk', title:'Lo que los europeos esperan del resto de ciudadanos',
+     paras:['En Europa existe una expectativa ampliamente compartida de que las opiniones deben basarse en evidencia fiable y verificable. Se espera de los buenos ciudadanos que se tomen el tiempo necesario para informarse y consulten diversas fuentes antes de respaldar una afirmación, compartirla o expresar públicamente opiniones al respecto.']}
+};
+var PREBUNK = {
+  1:{name:'placebo_prebunk', title:'Por qué el senderismo es bueno para la salud',
+     paras:[TXT_SENDERISMO_1, TXT_SENDERISMO_2]},
+  2:{name:'factual_prebunk', title:'El proceso legislativo de la UE', paras:[TXT_FACTCHECK]},
+  3:{name:'warning_prebunk', title:'Ten cuidado con la información falsa', paras:[TXT_WARNING]},
+  4:{name:'full_prebunk',   title:'Ten cuidado con la información falsa', paras:[TXT_WARNING, 'Pero en la Unión Europea la toma de decisiones no tiene lugar a puerta cerrada, sino que en ella intervienen múltiples instituciones y está sujeta a escrutinio por parte de distintos actores. Además, el Parlamento Europeo es elegido por la ciudadanía, la Comisión Europea es aprobada a través de procedimientos parlamentarios y el Consejo de la UE representa a los gobiernos nacionales. Con tantos controles e intereses cruzados, un complot demográfico sería extraordinariamente difícil de concebir y llevar a cabo. Asimismo, los registros históricos muestran que Richard Nikolaus Eijiro no desempeñó ningún papel en la fundación de la UE, lo que desmiente directamente esta narrativa.']}
+};
+
+/* ==========================================================================
+   2. ESTADO Y ASIGNACIÓN ALEATORIA
+   ========================================================================== */
+
+var S = {
+  answers:{}, comments:{}, timings:[], assign:{}, orders:{}, flips:{}, derived:{},
+  startTs:null, qStartTs:null, terminated:null, sent:false,
+  panel:{jumps:0, reshuffles:0, reopened:0}
+};
+
+function assignAll(){
+  S.assign = {
+    S0:6,
+    block_order: pick(['tradeoffs_first','conspiracy_first']),
+    spain_split_exp1: pick(['list','items']),
+    rama: pick(['A','B']),
+    list_arm: randInt(4),
+    condition_traits: randInt(9),
+    exp3_block: pick(['debunk','prebunk']),
+    condition_debunk: randInt(4),
+    condition_prebunk: randInt(4)
+  };
+  S.orders = {};
+  RANDOM_ROWS.forEach(function(code){
+    var items = ITEMS[code];
+    var free = items.filter(function(it){ return !it.fixed; }).map(function(it){ return it.key; });
+    var fixed = items.filter(function(it){ return it.fixed; }).map(function(it){ return it.key; });
+    S.orders[code] = shuffle(free).concat(fixed);
+  });
+  S.orders.list1 = shuffle(range(0, LIST1.length-1));
+  S.orders.list2 = shuffle(range(0, LIST2.length-1));
+  S.flips = {};
+  TRADEOFFS.forEach(function(t){ S.flips[t.code] = Math.random() < 0.5 ? 1 : 0; });
+  S.derived = {};
+}
+
+/* grupo menos preferido a partir de sympathy (empate -> uno al azar, memorizado) */
+function leastPreferred(answers){
+  var a = answers.sympathy || {};
+  var best = null, tied = [];
+  ITEMS.sympathy.forEach(function(it){
+    var v = a[it.key];
+    if(v == null) return;
+    if(best === null || v < best){ best = v; tied = [it]; }
+    else if(v === best){ tied.push(it); }
+  });
+  if(!tied.length) tied = ITEMS.sympathy.slice();
+  var sig = tied.map(function(i){ return i.key; }).join(',');
+  if(!S.derived.gmp || S.derived.gmpSig !== sig){
+    S.derived.gmpSig = sig;
+    S.derived.gmp = pick(tied).key;
+  }
+  var chosen = ITEMS.sympathy.filter(function(i){ return i.key === S.derived.gmp; })[0];
+  return chosen || ITEMS.sympathy[0];
+}
+
+function ageFrom(y, m){
+  if(!y) return null;
+  var now = new Date(), age = now.getFullYear() - y;
+  if(m && (now.getMonth()+1) < m) age--;
+  return age;
+}
+function quotAgeRange(age){
+  if(age == null) return '';
+  if(age < 18) return 'screen_out';
+  if(age <= 24) return '18_24';
+  if(age <= 34) return '25_34';
+  if(age <= 44) return '35_44';
+  if(age <= 54) return '45_54';
+  if(age <= 65) return '55_65';
+  return 'more_65';
+}
+
+/* ==========================================================================
+   3. CONSTRUCTOR DEL FLUJO
+   ========================================================================== */
+
+function buildFlow(){
+  var F = [];
+  function push(q){ F.push(q); return q; }
+  var A = S.assign;
+
+  /* ---------- SCREENER ---------- */
+  var B = 'SCREENER';
+  push({block:B, code:'birthdate', type:'birthdate', varTag:'birth',
+    title:'Por favor, proporciona tu fecha de nacimiento',
+    terminate:function(ans){
+      var b = ans.birthdate; if(!b || !b.year) return false;
+      return ageFrom(b.year, b.month) < 18;
+    }});
+  push({block:B, code:'GENDER_NONBINARY', type:'single', varTag:'gender', title:'Eres:',
+    options:[{code:2,label:'Mujer'},{code:1,label:'Hombre'},{code:3,label:'Otro género'},{code:4,label:'Prefiero no contestar'}]});
+  push({block:B, code:'QMktSize_ES', type:'residence', varTag:'residence', title:'¿Dónde vives?'});
+  push({block:B, code:'ES01EDU', type:'single', varTag:'ES01EDU',
+    title:'¿Cuál es tu nivel más alto de educación alcanzado?',
+    options:[
+      {code:1,label:'Educación primaria'},
+      {code:2,label:'Educación secundaria obligatoria (Graduado en educación secundaria)'},
+      {code:3,label:'Formación profesional de grado medio (Técnico)'},
+      {code:4,label:'Bachillerato'},
+      {code:5,label:'Formación profesional de grado superior (Técnico superior)'},
+      {code:6,label:'Estudios universitarios / Enseñanzas artísticas de grado superior (Diplomado, Licenciado, Titulación Superior por especialidad, Máster, Doctorado, etc.)'}
+    ]});
+
+  /* ---------- BLOQUE 0 · CONSENTIMIENTO ---------- */
+  B = 'CONSENTIMIENTO';
+  push({block:B, code:'Consent', type:'doc', varTag:'Consent',
+    docTitle:'Detalles de la encuesta',
+    html:
+      '<p>Se te invita a participar en un estudio que forma parte de un proyecto de investigación sobre valores democráticos y opinión pública, llevado a cabo por el equipo TaCT-FoRSED de la Universitat Autònoma de Barcelona (UAB). El objetivo del estudio es investigar las opiniones de los individuos sobre cuestiones políticas y cómo las personas evalúan la información relativa a dichas cuestiones.</p>'+
+      '<h3>Procedimiento</h3><p>Si decides participar, deberás completar este cuestionario en línea. Te llevará aproximadamente unos 25 minutos.</p>'+
+      '<h3>Participación voluntaria y retirada</h3><p>La participación en esta investigación es voluntaria. No tienes ninguna obligación de participar en este estudio. Incluso si en un primer momento decides participar y posteriormente cambias de opinión, tienes derecho a abandonar el estudio en cualquier momento.</p>'+
+      '<h3>Confidencialidad</h3><p>No te solicitaremos ningún dato personal ni información de contacto. Los resultados de esta investigación se resumirán y presentarán de forma agregada. No se te identificará personalmente. Tus datos se mantendrán en el más estricto anonimato. La información que proporciones se almacenará en servidores seguros de Microsoft gestionados por la UAB, accesibles únicamente mediante dispositivos protegidos con contraseña y cortafuegos, hasta el año 2028.</p>'+
+      '<h3>Requisitos de ciencia abierta</h3><p>De conformidad con los requisitos de la financiación Horizonte Europa (Unión Europea), debemos garantizar el acceso abierto a los datos de investigación depositados en un repositorio de confianza siguiendo los principios FAIR. A principios de 2028, algunas partes del conjunto de datos completamente anonimizado generado por este estudio se depositarán en un repositorio de Ciencia Abierta que cumpla dichos principios.</p>'+
+      '<h3>Contacto</h3><p>Para obtener más información sobre la investigación, puedes ponerte en contacto con los investigadores: Carolina Galais (Carolina.Galais@uab.cat), Marc Guinjoan (marc.guinjoanc@uab.cat) y Alejandro Fernández-Roldán (alejandro.fernandezroldan@uab.cat).</p>',
+    question:'Por favor, selecciona una de las siguientes opciones. Si no deseas participar, la encuesta finalizará de inmediato:',
+    options:[{code:1,label:'Sí, estoy de acuerdo en participar.'},{code:2,label:'No, no estoy de acuerdo en participar.'}],
+    terminate:function(ans){ return ans.Consent === 2; }});
+
+  /* ---------- BLOQUE 1 · SOCIODEMO ---------- */
+  B = 'B1 · SOCIODEMO';
+  push({block:B, code:'household_size', type:'single', varTag:'household_size',
+    title:'¿En total cuántas personas viven en tu hogar incluyéndote a ti?',
+    options:[{code:1,label:'1'},{code:2,label:'2'},{code:3,label:'3'},{code:4,label:'4'},
+             {code:5,label:'5'},{code:6,label:'6'},{code:7,label:'7 o más'}]});
+  push({block:B, code:'children_u14', type:'single', varTag:'children_u14',
+    title:'¿De las personas que viven en tu hogar cuántas tienen 14 años o menos?',
+    options:[{code:0,label:'0'},{code:1,label:'1'},{code:2,label:'2'},{code:3,label:'3'},{code:4,label:'4 o más'}],
+    dynOptions:function(ans){
+      var h = ans.household_size;
+      if(h == null) return null;
+      var max = Math.min(4, h - 1);
+      return [{code:0,label:'0'},{code:1,label:'1'},{code:2,label:'2'},{code:3,label:'3'},{code:4,label:'4 o más'}]
+        .filter(function(o){ return o.code <= max; });
+    },
+    dynNote:function(ans){
+      var h = ans.household_size;
+      if(h == null || h > 5) return null;
+      return 'Has indicado que en tu hogar vivís ' + (h === 7 ? '7 o más' : h) + ' personas, contándote a ti.';
+    },
+    skipIf:function(ans){ return ans.household_size != null && ans.household_size === 1; }});
+  push({block:B, code:'area', type:'single', varTag:'area',
+    title:'¿Cómo describirías el lugar en el que vives?',
+    options:[{code:1,label:'Una granja o una casa en el campo'},{code:2,label:'Un pueblo'},
+             {code:3,label:'Una ciudad pequeña o mediana'},{code:4,label:'Las afueras de una gran ciudad'},
+             {code:5,label:'Una gran ciudad'}]});
+  push({block:B, code:'housing', type:'single', varTag:'housing',
+    title:'¿Cuál de las siguientes situaciones se aplica al hogar en el que resides?',
+    options:[{code:1,label:'Vivo en una casa propiedad, totalmente pagada y sin hipoteca/préstamo'},
+             {code:2,label:'Vivo en una casa en propiedad, con hipoteca/préstamo'},
+             {code:3,label:'Vivo solo/a de alquiler'},
+             {code:4,label:'Vivo con mi pareja, familia o amistades pagando alquiler'},
+             {code:5,label:'Vivo con mi pareja, familia o amistades sin pagar alquiler'},
+             {code:6,label:'Otra situación'}]});
+  push({block:B, code:'country_birth', type:'dropdown', varTag:'country_birth',
+    title:'¿Cuál es tu país de nacimiento?', selectLabel:'País',
+    options:PAISES.map(function(p,i){ return {code:i+1, label:p}; })});
+  push({block:B, code:'citizen', type:'single', varTag:'citizen',
+    title:'¿Eres ciudadano de España?',
+    options:[{code:1,label:'Sí, de nacimiento'},{code:2,label:'Sí, por naturalización'},{code:3,label:'No'}]});
+  push({block:B, code:'country_citizen', type:'dropdown', varTag:'country_citizen',
+    title:'¿De qué país eres ciudadano?', selectLabel:'País',
+    options:PAISES.map(function(p,i){ return {code:i+1, label:p}; }),
+    skipIf:function(ans){ return ans.citizen != null && ans.citizen !== 3; }});
+  push({block:B, code:'religion', type:'single', varTag:'religion',
+    title:'¿Cómo te defines en materia religiosa?',
+    options:[{code:1,label:'No religioso'},{code:2,label:'Católico/a'},{code:3,label:'Protestante'},
+             {code:4,label:'Cristiano/a ortodoxo/a'},{code:5,label:'Judío'},{code:6,label:'Musulmán'},
+             {code:7,label:'Hindú'},{code:8,label:'Budista'},{code:9,label:'Otro'},
+             {code:99,label:'Prefiero no contestar'}]});
+  push({block:B, code:'religiosity', type:'scale', varTag:'religiosity', min:0, max:10,
+    title:'Independientemente de si perteneces o no a una religión concreta, ¿cómo de religioso/a dirías que eres?',
+    poles:['0 · Nada religioso','10 · Muy religioso'],
+    skipIf:function(ans){ return ans.religion != null && ans.religion === 1; }});
+  push({block:B, code:'discrim', type:'single', varTag:'discrim',
+    title:'¿Dirías que perteneces a un grupo que sufre discriminación?',
+    options:[{code:1,label:'No'},{code:2,label:'Sí'}]});
+  push({block:B, code:'discrim_reasons', type:'multi', varTag:'discrim_reasons',
+    title:'¿Por qué motivo o motivos te sientes discriminado/a?',
+    note:'Selecciona todas las opciones que correspondan.',
+    items:ITEMS.discrim_reasons, randomized:true,
+    skipIf:function(ans){ return ans.discrim != null && ans.discrim !== 2; }});
+
+  /* ---------- BLOQUE 2 · ACTITUDES ---------- */
+  B = 'B2 · ACTITUDES';
+  push({block:B, code:'life_sat', type:'scale', varTag:'life_sat', min:0, max:10,
+    title:'¿En qué medida te sientes satisfecho/a o insatisfecho/a con tu vida en general?',
+    poles:['0 · Extremadamente insatisfecho','10 · Extremadamente satisfecho']});
+  push({block:B, code:'pol_interest', type:'single', varTag:'pol_interest',
+    title:'¿Cuánto interés tienes en la política?',
+    options:[{code:1,label:'Ningún interés'},{code:2,label:'Poco interés'},
+             {code:3,label:'Bastante interés'},{code:4,label:'Mucho interés'}]});
+  push({block:B, code:'pol_soph', type:'grid', varTag:'pol_soph',
+    title:'¿En qué medida estás de acuerdo con las siguientes afirmaciones?',
+    items:ITEMS.pol_soph, cols:LIK5});
+  push({block:B, code:'auth', type:'grid', varTag:'auth',
+    title:'¿En qué medida estás de acuerdo con las siguientes afirmaciones?',
+    items:ITEMS.auth, cols:LIK7});
+  push({block:B, code:'ideology', type:'scale', varTag:'ideology', min:0, max:10,
+    title:'En política, se suele hablar de izquierda y derecha. En esta escala de 0 a 10, donde 0 significa izquierda y 10 derecha, ¿dónde te situarías tú?',
+    poles:['0 · Izquierda','10 · Derecha']});
+  push({block:B, code:'nat_pride', type:'grid', varTag:'nat_pride',
+    title:'¿Cómo de orgulloso/a estás de ser...?',
+    items:ITEMS.nat_pride, cols:SCALE011, poleLabels:['Nada orgulloso','Muy orgulloso']});
+  push({block:B, code:'eu_attach', type:'scale', varTag:'eu_attach', min:0, max:10,
+    title:'¿En qué medida te sientes emocionalmente vinculado/a a Europa?',
+    poles:['0 · Nada vinculado/a','10 · Muy vinculado/a']});
+  push({block:B, code:'values', type:'grid', varTag:'values',
+    title:'¿En qué medida estás de acuerdo con las siguientes afirmaciones?',
+    items:ITEMS.values, cols:LIK5});
+  push({block:B, code:'dem_sat', type:'scale', varTag:'dem_sat', min:0, max:10,
+    title:'¿En qué medida estás satisfecho/a con el funcionamiento de la democracia en España?',
+    poles:['0 · Extremadamente insatisfecho','10 · Extremadamente satisfecho']});
+  push({block:B, code:'social_trust', type:'scale', varTag:'social_trust', min:0, max:10,
+    title:'En general, ¿dirías que se puede confiar en la mayoría de la gente, o que nunca se es demasiado prudente al tratar con los demás?',
+    poles:['0 · Nunca se es demasiado prudente','10 · Se puede confiar en la mayoría de la gente']});
+  push({block:B, code:'social_meet', type:'single', varTag:'social_meet',
+    title:'¿Con qué frecuencia quedas con amigos/as, familiares o compañeros/as de trabajo?',
+    options:[{code:1,label:'Nunca'},{code:2,label:'Menos de una vez al mes'},{code:3,label:'Una vez al mes'},
+             {code:4,label:'Varias veces al mes'},{code:5,label:'Una vez a la semana'},
+             {code:6,label:'Varias veces a la semana'},{code:7,label:'Casi cada día'}]});
+  push({block:B, code:'confidants', type:'single', varTag:'confidants',
+    title:'¿Con cuántas personas puedes hablar de temas íntimos y personales?',
+    options:[{code:0,label:'Con ninguna (0)'},{code:1,label:'1'},{code:2,label:'2'},{code:3,label:'3'},
+             {code:4,label:'4-6'},{code:5,label:'7-9'},{code:6,label:'10 o más'}]});
+  push({block:B, code:'voted', type:'single', varTag:'voted',
+    title:'Hay personas que, por una razón u otra, no votan en las elecciones. ¿Tú personalmente votaste en las últimas elecciones nacionales de España, celebradas en julio de 2023?',
+    options:[{code:1,label:'Sí, voté'},{code:2,label:'Normalmente voto, pero esta vez no pude'},
+             {code:3,label:'No tenía derecho a voto'},{code:4,label:'No voté'},
+             {code:99,label:'Prefiero no contestar'}]});
+  push({block:B, code:'vote_choice', type:'single', varTag:'vote_choice',
+    title:'¿A qué partido votaste en esas elecciones?', options:PARTIDOS_ES,
+    skipIf:function(ans){ return ans.voted != null && ans.voted !== 1; }});
+  push({block:B, code:'vote_intention', type:'single', varTag:'vote_intention',
+    title:'Suponiendo que mañana se celebrasen elecciones generales, ¿a qué partido votarías?',
+    options:PARTIDOS_ES});
+  push({block:B, code:'partip', type:'multi', varTag:'partip',
+    title:'Durante los últimos 12 meses, ¿has realizado alguna de las siguientes acciones?',
+    note:'Selecciona todas las opciones que correspondan.',
+    items:ITEMS.partip, randomized:true});
+  push({block:B, code:'violence_just', type:'scale', varTag:'violence_just', min:0, max:10,
+    title:'¿Hasta qué punto crees que está justificado recurrir a la fuerza o a la violencia para promover un objetivo político importante que apoyas?',
+    poles:['0 · Nunca está justificado','10 · Siempre está justificado']});
+  push({block:B, code:'inst_trust', type:'grid', varTag:'inst_trust',
+    title:'Utilizando una escala de 0 a 10, donde 0 significa que no confías nada en una institución y 10 que confías completamente en ella, ¿cuánta confianza tienes personalmente en cada una de las siguientes instituciones?',
+    items:ITEMS.inst_trust, cols:SCALE011, poleLabels:['Ninguna confianza','Absoluta confianza']});
+  push({block:B, code:'sympathy', type:'grid', varTag:'sympathy',
+    title:'Ahora nos gustaría preguntarte cuánta simpatía sientes hacia los siguientes grupos. Utiliza una escala de 0 a 10, donde 0 significa “ninguna simpatía” y 10 significa “mucha simpatía”.',
+    items:ITEMS.sympathy, cols:SCALE011, poleLabels:['Ninguna simpatía','Mucha simpatía']});
+  push({block:B, code:'intol', type:'grid', varTag:'intol',
+    title:'¿En qué medida estás de acuerdo con las siguientes afirmaciones?:',
+    items:ITEMS.intol, cols:LIK5, randomized:true, pipeGroup:true});
+  push({block:B, code:'immig_econ', type:'scale', varTag:'immig_econ', min:0, max:10,
+    title:'Piensa en el efecto de los inmigrantes en la economía. ¿Consideras que este es negativo o positivo?',
+    poles:['0 · Muy negativo','10 · Muy positivo']});
+  push({block:B, code:'immig_culture', type:'scale', varTag:'immig_culture', min:0, max:10,
+    title:'Respecto a la cultura y las costumbres de los inmigrantes, ¿consideras nada o muy importante para la convivencia que tengan la misma cultura y costumbres que la población del país?',
+    poles:['0 · Nada importante','10 · Muy importante']});
+
+  /* ---------- BLOQUES 3 y 4 (orden aleatorio) ---------- */
+  function blockTradeoffs(){
+    var b = 'B3 · TRADE-OFFS';
+    push({block:b, code:'tradeoff_intro', type:'info', varTag:'tradeoff_intro',
+      html:'<p>A continuación, te presentamos varias parejas de principios que en ocasiones entran en tensión dentro de una democracia. Para cada pareja, indícanos cuál de los dos principios crees que debería prevalecer cuando existe un conflicto entre ambos.</p>'});
+    TRADEOFFS.forEach(function(t, i){
+      var opts = [
+        {code:1,label:t.p1},{code:2,label:'2'},{code:3,label:'3'},
+        {code:4,label:'Dar igual prioridad a ambas'},
+        {code:5,label:'5'},{code:6,label:'6'},{code:7,label:t.p7}
+      ];
+      if(S.flips[t.code]) opts = opts.slice().reverse();
+      opts = opts.concat([{code:8,label:'No lo sé'}]);
+      push({block:b, code:t.code, type:'single', varTag:t.code,
+        title: i === 0 ? '¿Cuál de estas dos opciones crees que debería prevalecer?'
+                       : '¿Cuál de estos dos principios crees que debería prevalecer cuando existe un conflicto entre ambos?',
+        options:opts});
+    });
+  }
+  function blockConspiracy(){
+    var b = 'B4 · CONSPIRACY BELIEFS';
+    push({block:b, code:'cmq', type:'grid', varTag:'cmq',
+      title:'¿Cómo calificarías las siguientes afirmaciones? Por favor, indica la probabilidad en una escala del 0 al 10, donde 0 significa que crees que la afirmación es totalmente falsa y 10 significa que crees que la afirmación es totalmente cierta.',
+      items:ITEMS.cmq, cols:SCALE011, poleLabels:['0 – Totalmente falso','10 – Totalmente verdadero']});
+    push({block:b, code:'gcbs', type:'grid', varTag:'gcbs',
+      title:'A menudo existe debate sobre si el público conoce o no la verdad completa acerca de diversos temas importantes. Por favor, indica en qué medida estás de acuerdo con las siguientes afirmaciones:',
+      items:ITEMS.gcbs, cols:LIK5});
+    push({block:b, code:'consp_bel', type:'grid', varTag:'consp_bel',
+      title:'Por favor, indica en qué medida crees que las siguientes afirmaciones son verdaderas o falsas:',
+      items:ITEMS.consp_bel, cols:[
+        {code:1,label:'1- Totalmente falso'},{code:2,label:'2- Probablemente falso'},
+        {code:3,label:'3- Ni verdadero ni falso'},{code:4,label:'4- Probablemente verdadero'},
+        {code:5,label:'5- Totalmente verdadero'}]});
+  }
+  if(A.block_order === 'tradeoffs_first'){ blockTradeoffs(); blockConspiracy(); }
+  else { blockConspiracy(); blockTradeoffs(); }
+
+  /* ---------- BLOQUE 5 · PSYCHOSOCIAL ---------- */
+  push({block:'B5 · PSYCHOSOCIAL', code:'psych', type:'grid', varTag:'psych',
+    title:'¿En qué medida estás de acuerdo con las siguientes afirmaciones?',
+    items:ITEMS.psych, cols:LIK7, randomized:true});
+
+  /* ---------- BLOQUE 6 · MEDIA ---------- */
+  B = 'B6 · MEDIA';
+  push({block:B, code:'media_freq', type:'grid', varTag:'media_freq',
+    title:'¿Con qué frecuencia sigues la política a través de los siguientes medios?',
+    items:ITEMS.media_freq, cols:[
+      {code:1,label:'Nunca'},{code:2,label:'Raramente'},{code:3,label:'A veces'},
+      {code:4,label:'A menudo'},{code:5,label:'Siempre'}]});
+  push({block:B, code:'media_rel', type:'grid', varTag:'media_rel',
+    title:'En general, ¿cómo valorarías la fiabilidad de las noticias sobre asuntos políticos que encuentras en los siguientes medios?',
+    items:ITEMS.media_rel, randomized:true, cols:[
+      {code:1,label:'Nada fiable'},{code:2,label:'Un poco fiable'},{code:3,label:'Bastante fiable'},
+      {code:4,label:'Muy fiable'},{code:5,label:'No lo sé / no lo conozco'}]});
+  push({block:B, code:'sm_use', type:'grid', varTag:'sm_use',
+    title:'¿De qué manera utilizas las siguientes plataformas de redes sociales para informarte?',
+    items:ITEMS.sm_use, randomized:true, cols:[
+      {code:0,label:'No tengo una cuenta'},{code:1,label:'Tengo una cuenta, pero no la uso'},
+      {code:2,label:'La uso de forma pasiva (veo contenido)'},
+      {code:3,label:'La uso también de forma activa (veo y publico contenido)'}],
+    skipIf:function(ans){ return ans.media_freq != null && ans.media_freq.media_social === 1; }});
+  push({block:B, code:'sm_share', type:'single', varTag:'sm_share',
+    title:'¿Con qué frecuencia publicas, envías o reenvías información sobre temas políticos? Esto incluye correos electrónicos, foros (por ejemplo, Reddit) y aplicaciones de mensajería instantánea (por ejemplo, WhatsApp o Telegram).',
+    options:[{code:1,label:'Menos de una vez al mes'},{code:2,label:'Una o dos veces al mes'},
+             {code:3,label:'Una vez a la semana'},{code:4,label:'Unas cuantas veces a la semana'},
+             {code:5,label:'Una vez al día'},{code:6,label:'Unas cuantas veces al día'},
+             {code:7,label:'Muchas veces al día'}],
+    skipIf:function(ans){ return ans.media_freq != null && ans.media_freq.media_social === 1; }});
+
+  /* ---------- BLOQUE 7 · EXPERIMENTO 1 ---------- */
+  B = 'B7 · EXPERIMENTO 1';
+  if(A.spain_split_exp1 === 'list'){
+    var sens = SENSITIVE[A.rama];
+    var listBlock = function(which, treat, first){
+      var base = which === 1 ? LIST1 : LIST2;
+      var order = which === 1 ? S.orders.list1 : S.orders.list2;
+      var shown = order.map(function(i){ return {tag:'L' + which + '_' + (i+1), text:base[i]}; });
+      var n = base.length + (treat ? 1 : 0);
+      if(treat){
+        var pos = Math.floor(Math.random() * (shown.length + 1));
+        shown.splice(pos, 0, {tag:'SENSITIVE', text:sens});
+      }
+      var code = 'list' + which + '_' + (treat ? 'treat' : 'control');
+      push({block:B, code:code, type:'single', varTag:code,
+        title: first
+          ? 'Las personas tienen diversas ideas sobre cómo funciona el mundo. A continuación, hay una lista de ' + n + ' afirmaciones. ¿Cuántas de ellas reflejan tu propia manera de pensar? Por favor, indica sólo el número total, no es necesario que indiques cuáles.'
+          : 'Y ahora estas ' + n + ' afirmaciones:',
+        listLines:shown.map(function(x){ return x.text; }),
+        listOrder:shown.map(function(x){ return x.tag; }),
+        question:'¿Cuántas de estas ideas reflejan tu propia manera de pensar? Recuerda que sólo debes indicar el número total.',
+        options:numOpts(0, n)});
+    };
+    var routes = {
+      1:[[1,false],[2,true]],
+      2:[[1,true],[2,false]],
+      3:[[2,false],[1,true]],
+      4:[[2,true],[1,false]]
+    };
+    routes[A.list_arm].forEach(function(step, i){ listBlock(step[0], step[1], i === 0); });
+    push({block:B, code:'directQ', type:'single', varTag:'directQ',
+      title:'Y, por último, lee la siguiente afirmación:',
+      stimHtml:'<p>“' + DIRECTQ_TEXT[A.rama] + '”</p>',
+      question:'¿Refleja esta afirmación tu manera de pensar?',
+      options:[{code:0,label:'No'},{code:1,label:'Sí'}]});
+  } else {
+    push({block:B, code:'items_spain', type:'grid', varTag:'items_spain',
+      title:'A continuación, te presentamos una serie de afirmaciones sobre distintos temas. Para cada una, indica si crees que es cierta o no:',
+      items:ITEMS.items_spain, randomized:true,
+      cols:[{code:1,label:'Sí'},{code:0,label:'No'}]});
+  }
+
+  /* ---------- BLOQUE 8 · EXPERIMENTO 2 (TRAITS) ---------- */
+  B = 'B8 · EXPERIMENTO 2';
+  var tr = TRAITS[A.condition_traits];
+  push({block:B, code:'traits_stim', type:'info', varTag:'traits_stim',
+    intro:'Por favor, lee con atención el siguiente texto.',
+    html:'<h3>' + tr.title + '</h3>' + tr.paras.map(function(p){ return '<p>' + mdToHtml(p) + '</p>'; }).join('')});
+  push({block:B, code:'emo_traits', type:'grid', varTag:'emo_traits',
+    title:'¿En qué medida sientes las siguientes emociones después de leer el texto?',
+    items:ITEMS.emo_traits, cols:[
+      {code:1,label:'Nada'},{code:2,label:'Un poco'},{code:3,label:'Algo'},
+      {code:4,label:'Bastante'},{code:5,label:'Mucho'}]});
+  push({block:B, code:'cred_traits', type:'single', varTag:'cred_traits',
+    title:'¿En qué medida crees que el texto sobre educación que acabas de leer es verdadero?',
+    options:[{code:1,label:'Definitivamente falso'},{code:2,label:'Probablemente falso'},
+             {code:3,label:'Probablemente verdadero'},{code:4,label:'Definitivamente verdadero'},
+             {code:99,label:'No lo sé'}]});
+  push({block:B, code:'educ_sat', type:'scale', varTag:'educ_sat', min:0, max:10,
+    title:'En general, ¿cuál es tu grado de satisfacción con el estado de la educación en España en la actualidad?',
+    poles:['0 · Totalmente insatisfecho/a','10 · Totalmente satisfecho/a']});
+  push({block:B, code:'pol_opinion', type:'scale', varTag:'pol_opinion', min:0, max:10,
+    title:'Utilizando una escala de 0 a 10, donde 0 significa “nunca tengo opiniones sobre temas políticos” y 10 significa “siempre tengo opiniones sobre temas políticos”, ¿dónde te situarías?',
+    poles:['0 · Nunca tengo opiniones','10 · Siempre tengo opiniones']});
+  push({block:B, code:'pop', type:'grid', varTag:'pop',
+    title:'¿En qué medida estás de acuerdo con las siguientes afirmaciones?',
+    items:ITEMS.pop, cols:LIK5_POP, randomized:true});
+  push({block:B, code:'manip_traits', type:'grid', varTag:'manip_traits',
+    title:'¿Y en qué medida estás de acuerdo con las siguientes afirmaciones sobre el texto que has leído?',
+    items:ITEMS.manip_traits, randomized:true, cols:[
+      {code:1,label:'Totalmente en desacuerdo'},{code:2,label:'En desacuerdo'},
+      {code:3,label:'De acuerdo'},{code:4,label:'Totalmente de acuerdo'}]});
+
+  /* ---------- BLOQUE 9 · LAST SOCIODEMO ---------- */
+  B = 'B9 · SOCIODEMO';
+  push({block:B, code:'marital', type:'single', varTag:'marital', title:'¿Cuál es tu estado civil?',
+    options:[{code:1,label:'Casado/a'},{code:2,label:'Pareja de hecho'},{code:3,label:'Conviviendo con una pareja'},
+             {code:4,label:'Viudo/a'},{code:5,label:'Divorciado/a'},{code:6,label:'Separado/a'},
+             {code:7,label:'Soltero/a y nunca casado'},{code:99,label:'Prefiero no contestar'}]});
+  push({block:B, code:'class_subj', type:'single', varTag:'class_subj',
+    title:'La mayoría de las personas se consideran pertenecientes a una determinada clase social. ¿A qué clase social dirías que perteneces?',
+    options:[{code:1,label:'Clase baja'},{code:2,label:'Clase trabajadora'},{code:3,label:'Clase media-baja'},
+             {code:4,label:'Clase media'},{code:5,label:'Clase media-alta'},{code:6,label:'Clase alta'}]});
+
+  /* ---------- BLOQUE 10 · EXPERIMENTO 3 ---------- */
+  B = 'B10 · EXPERIMENTO 3';
+  var kalergiHtml = '<h3>' + KALERGI.title + '</h3>' + KALERGI.paras.map(function(p){ return '<p>' + p + '</p>'; }).join('');
+  if(A.exp3_block === 'debunk'){
+    var db = DEBUNK[A.condition_debunk];
+    push({block:B, code:'kalergi_text', type:'info', varTag:'kalergi_text',
+      intro:'En la siguiente página encontrarás un pequeño texto. Por favor, léelo con atención:',
+      html:kalergiHtml});
+    push({block:B, code:'exp3_text', type:'info', varTag:'exp3_text',
+      intro:'Por favor, lee este otro pequeño texto y a continuación responde a unas preguntas:',
+      html:'<h3>' + db.title + '</h3>' + db.paras.map(function(p){ return '<p>' + p + '</p>'; }).join('')});
+  } else {
+    var pb = PREBUNK[A.condition_prebunk];
+    push({block:B, code:'exp3_text', type:'info', varTag:'exp3_text',
+      intro:'Por favor, lee con atención el siguiente texto:',
+      html:'<h3>' + pb.title + '</h3>' + pb.paras.map(function(p){ return '<p>' + p + '</p>'; }).join('')});
+    push({block:B, code:'kalergi_text', type:'info', varTag:'kalergi_text',
+      intro:'Por favor, de nuevo te pedimos que leas el siguiente texto con atención:',
+      html:kalergiHtml});
+  }
+  push({block:B, code:'kalergi_cred', type:'single', varTag:'kalergi_cred',
+    title:"¿En qué medida crees que el 'Plan Kalergi' es cierto?",
+    options:[{code:1,label:'Definitivamente falso'},{code:2,label:'Probablemente falso'},
+             {code:3,label:'Probablemente verdadero'},{code:4,label:'Definitivamente verdadero'},
+             {code:99,label:'No lo sé'}]});
+  push({block:B, code:'kalergi_share', type:'scale', varTag:'kalergi_share', min:0, max:5,
+    title:'En una escala del 0 al 5, donde 0 significa que definitivamente no compartirías el ' +
+      (A.exp3_block === 'debunk' ? 'primer' : 'último') +
+      " texto sobre el 'plan Kalergi' en tus redes sociales, y 5 significa que definitivamente sí lo compartirías, ¿qué probabilidad hay de que compartas el texto?",
+    poles:['0 · Definitivamente no compartiría este texto','5 · Definitivamente sí compartiría este texto']});
+  push({block:B, code:'eu_att', type:'grid', varTag:'eu_att',
+    title:'¿En qué medida estás de acuerdo con las siguientes afirmaciones?',
+    items:ITEMS.eu_att, cols:LIK7_EU});
+  push({block:B, code:'eu_identity', type:'scale', varTag:'eu_identity', min:0, max:10,
+    title:'¿Y en qué medida te sientes identificado/a con la Unión Europea?',
+    poles:['0 · Nada identificado/a','10 · Muy identificado/a']});
+  push({block:B, code:'eu_referendum', type:'single', varTag:'eu_referendum',
+    title:'Imagina que mañana se celebrara un referéndum sobre la pertenencia a la Unión Europea de España. ¿Qué votarías en este referéndum?',
+    options:[{code:1,label:'Seguir siendo miembro de la UE'},{code:2,label:'Abandonar la UE'},
+             {code:3,label:'Votaría en blanco'},{code:4,label:'Emitiría voto nulo'},
+             {code:5,label:'No votaría'},{code:99,label:'No tengo derecho a voto'}]});
+
+  /* ---------- BLOQUE 11 · LOCAL CTs ---------- */
+  push({block:'B11 · LOCAL CTs', code:'local', type:'grid', varTag:'local',
+    title:'Por favor, indica en qué medida crees que las siguientes afirmaciones son verdaderas o falsas.',
+    items:ITEMS.local, randomized:true, cols:[
+      {code:1,label:'Definitivamente falso'},{code:2,label:'Probablemente falso'},
+      {code:3,label:'Probablemente verdadero'},{code:4,label:'Definitivamente verdadero'},
+      {code:99,label:'No lo sé / no había oído hablar de ello'}]});
+
+  /* ---------- BLOQUE 12 · LAST SOCIODEMO ---------- */
+  B = 'B12 · SOCIODEMO';
+  push({block:B, code:'employment', type:'single', varTag:'employment',
+    title:'¿Cuál de las siguientes opciones describe mejor tu situación actual?',
+    options:[{code:1,label:'Empleado/a a tiempo completo'},{code:2,label:'Empleado/a a tiempo parcial'},
+             {code:3,label:'Autónomo/a'},{code:4,label:'En desempleo y buscando trabajo'},
+             {code:5,label:'En desempleo y sin buscar trabajo'},{code:6,label:'Jubilado/a'},
+             {code:7,label:'Estudiante'},{code:8,label:'Trabajador/a doméstico no remunerado/a'},
+             {code:9,label:'Tengo una incapacidad permanente'}]});
+  push({block:B, code:'dark_triad', type:'grid', varTag:'dark_triad',
+    title:'Tiendo a verme como alguien que...',
+    items:ITEMS.dark_triad, cols:LIK7, randomized:true});
+  push({block:B, code:'trauma', type:'multi', varTag:'trauma',
+    title:'A veces las personas viven situaciones aterradoras, horribles o traumáticas. ¿Has vivido alguna de las siguientes experiencias?',
+    note:'Selecciona todas las opciones que correspondan.',
+    items:ITEMS.trauma});
+  push({block:B, code:'styles', type:'grid', varTag:'styles',
+    title:'¿Con qué frecuencia usted personalmente...',
+    items:ITEMS.styles, randomized:true, cols:[
+      {code:1,label:'1- Todos los días'},{code:2,label:'2- Cada 2-3 días'},{code:3,label:'3- Cada 4-5 días'},
+      {code:4,label:'4- Aproximadamente una vez por semana'},{code:5,label:'5- Cada 2-3 semanas'},
+      {code:6,label:'6- Aproximadamente una vez al mes'},
+      {code:7,label:'7- Con menos frecuencia de una vez al mes'},{code:8,label:'8- Nunca'}]});
+  push({block:B, code:'income', type:'single', varTag:'income',
+    title:'¿Cuáles son los ingresos netos anuales de todos los miembros de tu hogar, sumando todas las fuentes (salarios, pensiones, prestaciones, rentas, etc.)?',
+    options:INCOME_ES});
+
+  /* ---------- DEBRIEFING ---------- */
+  B = 'DEBRIEFING';
+  push({block:B, code:'active_debrief', type:'doc', varTag:'active_debrief',
+    docTitle:'El propósito de esta encuesta',
+    html:buildDebriefHtml(A)});
+  push({block:B, code:'active_confirm', type:'single', varTag:'active_confirm',
+    title:'Confirmación activa',
+    note:'Para asegurarnos de que has comprendido el propósito de nuestro estudio y has leído la información sobre estas teorías de la conspiración que te hemos proporcionado en la página anterior, selecciona la opción adecuada:',
+    options:[
+      {code:1,label:'Reconozco que varias narrativas presentadas en este estudio eran falsas y se utilizaron únicamente con fines de investigación para comprender cómo se difunden la desinformación y las teorías de la conspiración en Europa.'},
+      {code:2,label:'No reconozco que varias narrativas presentadas en este estudio fueran falsas ni que se utilizaran únicamente con fines de investigación para comprender cómo se difunden la desinformación y las teorías de la conspiración en Europa.'}
+    ]});
+
+  assignVarKeys(F);
+  return F;
+}
+
+function buildDebriefHtml(A){
+  var h = '';
+  h += '<p>Gracias por participar. Este estudio ha sido diseñado específicamente para investigar cómo las personas procesan y creen en narrativas conspirativas falsas. Tu participación ha sido crucial para ayudarnos a comprender mejor las teorías de la conspiración y cómo evitar que se sigan difundiendo.</p>';
+  h += '<p>Para mantener la validez científica de los resultados, ha sido necesario presentarte varias teorías de la conspiración que circulan actualmente en el mundo real. Debemos señalar explícitamente que estas narrativas son falsas, factualmente incorrectas y no están respaldadas por ninguna evidencia.</p>';
+  h += '<p>A continuación, explicamos en detalle cuáles son y te proporcionamos enlaces con información fiable:</p>';
+  h += '<h2>Explicaciones experimentales</h2>';
+
+  var n = 1;
+  /* Sección 1: sólo si ha hecho el experimento de recuento de ítems */
+  if(A.spain_split_exp1 === 'list'){
+    if(A.rama === 'B'){
+      h += '<h3>' + (n++) + '. Un experimento de recuento de ítems, versión COVID-19</h3>';
+      h += '<p>Viste una lista en la que tenías que contar varios elementos, incluyendo una afirmación según la cual la COVID-19 sería un complot de las élites para reducir la población.</p>';
+      h += '<p><b>El hecho:</b> Esta teoría no tiene ningún fundamento. El consenso científico confirma que la COVID-19 fue una pandemia de origen natural.</p>';
+      h += '<p><b>Más información:</b> <a target="_blank" rel="noopener" href="https://www.sydney.edu.au/news-opinion/news/2022/08/18/how-do-we-know-the-origins-of-covid-came-from-a-market.html">¿Cómo sabemos que el origen de la COVID-19 provino de un mercado?</a></p>';
+    } else {
+      h += '<h3>' + (n++) + '. Un experimento de recuento de ítems, versión Chemtrails</h3>';
+      h += '<p>Viste una lista en la que tenías que contar varios elementos, incluyendo una afirmación según la cual los chemtrails formarían parte de un programa secreto para manipular el clima.</p>';
+      h += '<p><b>El hecho:</b> Las estelas de condensación son fenómenos habituales y bien explicados por la ciencia. Se forman cuando el vapor de agua de los gases de escape de los aviones se condensa sobre partículas emitidas por el motor y se congela en cristales de hielo a temperaturas frías y a gran altitud.</p>';
+      h += '<p><b>Más información:</b> <a target="_blank" rel="noopener" href="https://www.epa.gov/regulations-emissions-vehicles-and-engines/Contrails">La EPA sobre las estelas de condensación.</a></p>';
+    }
+  }
+  /* Sección 2: excepto pure_traits y active_traits */
+  var trName = TRAITS[A.condition_traits].name;
+  if(trName !== 'pure_traits' && trName !== 'active_traits'){
+    h += '<h3>' + (n++) + '. Narrativa sobre los estándares educativos</h3>';
+    h += '<p>Leíste un texto que sugería que los estándares educativos están siendo reducidos deliberadamente para controlar a la población.</p>';
+    h += '<p><b>El hecho:</b> El rendimiento del alumnado en evaluaciones educativas aumentó durante décadas antes de disminuir en los últimos años. La evidencia indica que esta caída está vinculada a múltiples factores, como el aumento del uso de redes sociales, cambios en los patrones de atención y las interrupciones relacionadas con la pandemia, entre otras explicaciones. Sin embargo, no existe ninguna política oculta destinada a reducir los estándares educativos.</p>';
+    h += '<p><b>Más información:</b> <a target="_blank" rel="noopener" href="https://www.nationsreportcard.gov/highlights/ltt/2022/">Las interrupciones escolares son perjudiciales para el rendimiento educativo.</a></p>';
+  }
+  /* Sección 3: sólo descriptive_debunk */
+  if(A.exp3_block === 'debunk' && DEBUNK[A.condition_debunk].name === 'descriptive_debunk'){
+    h += '<h3>' + (n++) + '. Encuesta sobre las creencias de otras personas</h3>';
+    h += '<p>Leíste la siguiente afirmación: “alrededor del 75% de la población considera falso que la Unión Europea fuese deliberadamente creada para “diluir” a las poblaciones europeas mediante la inmigración.” Esta afirmación se basó en los resultados de un estudio real, pero algunos de sus elementos fueron modificados con fines académicos. En concreto, la pregunta original no hacía referencia a la Unión Europea, sino a la población nativa. Además, el estudio se realizó en los siguientes países europeos: Alemania, Francia, Italia, Polonia y Reino Unido, entre otros.</p>';
+    h += '<p><b>El hecho:</b> En promedio, un 75% de las personas encuestadas en los diez países afirma no creer que existe un proyecto organizado cuyo objetivo es “reemplazar” a la población de su país por inmigrantes.</p>';
+    h += '<p><b>Más información:</b> <a target="_blank" rel="noopener" href="https://www.ipsos.com/en/perils/perils-perception-prejudice-and-conspiracy-theories-0">El estudio original puede encontrarse aquí.</a></p>';
+  }
+  /* Sección 4: todos */
+  h += '<h3>' + (n++) + '. El “Plan Kalergi”</h3>';
+  h += '<p>La información relativa a un supuesto “Plan Kalergi” para reemplazar a la población europea es una teoría de la conspiración antisemita y xenófoba bien documentada.</p>';
+  h += '<p><b>El hecho:</b> Richard von Coudenhove-Kalergi fue un diplomático de la década de 1920 que defendía la paz europea. Nunca propuso ningún plan de “reemplazo racial”. El supuesto “plan” fue inventado en la década de 2000 por un ideólogo neonazi para fomentar el miedo y la tensión étnica.</p>';
+  h += '<p><b>Más información:</b> <a target="_blank" rel="noopener" href="https://foantisemitism.org/kalergi-plan-conspiracy-debunked/">El mito del Plan Kalergi.</a></p>';
+  /* Sección 5: todos */
+  h += '<h3>' + (n++) + '. Teoría de la conspiración específica de tu país</h3>';
+  h += '<p>Antes de finalizar la encuesta, se te ha preguntado por una teoría de la conspiración que es especialmente relevante en tu país. Esta afirmación se ha incluido únicamente con fines de investigación y no debe interpretarse como verdadera. Aunque algunas de estas narrativas pueden hacer referencia a acontecimientos, personas o instituciones reales, la explicación conspirativa presentada en la encuesta no está respaldada por pruebas fiables. Te animamos a consultar fuentes fiables y basadas en la evidencia al evaluar este tipo de afirmaciones.</p>';
+  return h;
+}
+
+/* ---------- nombres de columna ---------- */
+function sanitize(k){
+  return String(k||'').replace(/[^A-Za-z0-9_]/g,'_').replace(/_+/g,'_').replace(/^_+|_+$/g,'');
+}
+function varKeyOf(q){
+  if(q.items) return sanitize(q.code || 'x');
+  var k = (q.varTag || '').replace(/[\[\]]/g,'').trim();
+  if(k.indexOf('/') >= 0) k = '';
+  k = k.replace(/\*/g,'').replace(/_+/g,'_').replace(/^_+|_+$/g,'');
+  if(!/^[A-Za-z0-9_]+$/.test(k)) k = '';
+  if(!k) k = q.code || 'x';
+  return sanitize(k);
+}
+function assignVarKeys(F){
+  var seen = {};
+  F.forEach(function(q){
+    var k = varKeyOf(q);
+    if(seen[k]) k = sanitize(k + '_' + q.code);
+    seen[k] = true;
+    q.varKey = k;
+  });
+}
+
+/* ==========================================================================
+   4. MOTOR
+   ========================================================================== */
+
+var FLOW = [];
+var idx = null;                       /* null = portada */
+var app = document.getElementById('app');
+
+function recordTiming(i, q, elapsed){
+  if(!S.timings[i]) S.timings[i] = {code:q.code, block:q.block, seconds:0};
+  S.timings[i].seconds += elapsed;
+}
+function resumeClock(){ S.qStartTs = Date.now(); }
+
+function setProgress(){
+  var bar = document.getElementById('pbar');
+  var pct = (idx == null) ? 0 : Math.min(100, Math.round((idx / FLOW.length) * 100));
+  bar.style.width = pct + '%';
+  var meta = document.getElementById('topmeta');
+  if(idx == null) meta.textContent = 'TaCT-FoRSED · UAB · España';
+  else if(idx >= FLOW.length) meta.textContent = 'Fin';
+  else meta.textContent = 'Pantalla ' + (idx+1) + ' de ' + FLOW.length;
+}
+
+function visibleAt(i){
+  var q = FLOW[i];
+  return !(q.skipIf && q.skipIf(S.answers));
+}
+
+function goTo(i, fromPanel){
+  if(idx != null && idx < FLOW.length && S.qStartTs)
+    recordTiming(idx, FLOW[idx], (Date.now()-S.qStartTs)/1000);
+  idx = i;
+  if(fromPanel) S.panel.jumps++;
+  if(!S.startTs) S.startTs = Date.now();
+  resumeClock();
+  renderCurrent();
+}
+
+function goBack(){
+  if(idx == null) return;
+  if(idx < FLOW.length && S.qStartTs)
+    recordTiming(idx, FLOW[idx], (Date.now()-S.qStartTs)/1000);
+  var j = Math.min(idx, FLOW.length) - 1;
+  while(j > 0 && !visibleAt(j)) j--;
+  if(j < 0){ idx = null; renderHome(); return; }
+  idx = j;
+  S.terminated = null;
+  resumeClock();
+  renderCurrent();
+}
+
+function advance(here){
+  var j = here + 1;
+  while(j < FLOW.length && !visibleAt(j)) j++;
+  idx = j;
+  resumeClock();
+  renderCurrent();
+}
+
+function renderCurrent(){
+  window.scrollTo(0,0);
+  setProgress();
+  if(idx == null){ renderHome(); return; }
+  if(idx >= FLOW.length || S.terminated){ renderEnd(); return; }
+  var q = FLOW[idx];
+  var here = idx;
+
+  var onNext = function(result){
+    recordTiming(here, q, (Date.now()-S.qStartTs)/1000);
+    if(q.code) S.answers[q.code] = result;
+    if(q.terminate && q.terminate(S.answers)){
+      S.terminated = (q.code === 'Consent') ? 'consent' : 'age';
+      idx = FLOW.length;
+      renderCurrent();
+      return;
+    }
+    S.terminated = null;
+    advance(here);
+  };
+
+  var node = RENDER[q.type](q, onNext, S.answers[q.code]);
+
+  /* caja de comentarios, añadida desde el motor */
+  var navr = node.querySelector('.btn-row');
+  if(navr) node.insertBefore(commentBox(q), navr); else node.appendChild(commentBox(q));
+
+  app.innerHTML = '';
+  app.appendChild(node);
+
+  var f = el('div','footlink','<a href="#" id="panellink">Panel del simulador</a>');
+  f.querySelector('a').onclick = function(e){
+    e.preventDefault();
+    S.panel.reopened++;
+    if(S.qStartTs) recordTiming(here, q, (Date.now()-S.qStartTs)/1000);
+    idx = null; renderCurrent();
+  };
+  app.appendChild(f);
+}
+
+/* ---------- caja de comentarios ---------- */
+function commentBox(q){
+  var key = q.varKey + '_comment';
+  var d = el('details','cbox');
+  var sum = el('summary', null, comSummary(q));
+  d.appendChild(sum);
+  var ta = el('textarea');
+  ta.placeholder = 'Escribe aquí cualquier comentario sobre esta pantalla: redacción, opciones que faltan, dudas...';
+  ta.value = S.comments[q.code] || '';
+  ta.oninput = function(){
+    S.comments[q.code] = ta.value;
+    d.setAttribute('data-filled', ta.value.trim() ? '1' : '0');
+    sum.innerHTML = comSummary(q);
+  };
+  d.setAttribute('data-filled', (S.comments[q.code]||'').trim() ? '1' : '0');
+  d.appendChild(ta);
+  d.appendChild(el('div','colname','Columna: ' + key));
+  if((S.comments[q.code]||'').trim()) d.open = true;
+  return d;
+}
+function comSummary(q){
+  return (S.comments[q.code]||'').trim()
+    ? '✓ Comentario escrito (haz clic para editarlo)'
+    : '¿Algún comentario sobre esta pantalla?';
+}
+
+/* ---------- barra de navegación ---------- */
+function navRow(onNext, getVal, validate){
+  var row = el('div','btn-row');
+  var back = el('button','nav ghost','← Atrás');
+  back.type = 'button';
+  back.onclick = goBack;
+  var next = el('button','nav','Continuar →');
+  next.type = 'button';
+  var err = el('div','err');
+  err.style.display = 'none';
+  next.onclick = function(){
+    if(validate){
+      var msg = validate();
+      if(msg){ err.textContent = msg; err.style.display = 'block'; return; }
+    }
+    err.style.display = 'none';
+    onNext(getVal());
+  };
+  row.appendChild(back);
+  row.appendChild(next);
+  return {row:row, err:err};
+}
+/* La fila de navegación se añade directamente a la tarjeta: el motor inserta la
+   caja de comentarios justo antes de `.btn-row`, y para eso su padre debe ser la
+   tarjeta y no un contenedor intermedio. */
+function addNav(card, nav){ card.appendChild(nav.row); card.appendChild(nav.err); }
+
+function shell(q, titleHtml, noteHtml){
+  var c = el('div','card');
+  if(q.block) c.appendChild(el('div','blocktag', q.block));
+  if(titleHtml) c.appendChild(el('div','qtitle', titleHtml));
+  if(noteHtml) c.appendChild(el('div','qnote', noteHtml));
+  return c;
+}
+
+/* ==========================================================================
+   5. RENDERIZADORES
+   ========================================================================== */
+var RENDER = {};
+
+RENDER.single = function(q, onNext, prev){
+  var c = shell(q, mdToHtml(q.title), q.note);
+  if(q.stimHtml) c.appendChild(el('div','stim', q.stimHtml));
+  if(q.listLines){
+    var ul = el('div','stim');
+    ul.innerHTML = '<ul>' + q.listLines.map(function(l){ return '<li>'+l+'</li>'; }).join('') + '</ul>';
+    c.appendChild(ul);
+  }
+  if(q.question) c.appendChild(el('div','qtitle', q.question));
+  var dyn = q.dynOptions ? q.dynOptions(S.answers) : null;
+  var options = dyn || q.options;
+  if(q.dynNote){
+    var dn = q.dynNote(S.answers);
+    if(dn) c.appendChild(el('div','qnote', dn));
+  }
+  var sel = (prev == null) ? null : prev;
+  var box = el('div','opts');
+  options.forEach(function(o){
+    var b = el('button','opt' + (sel === o.code ? ' sel' : ''));
+    b.type = 'button';
+    b.innerHTML = '<span class="bullet"></span><span>' + o.label + '</span>';
+    b.onclick = function(){
+      sel = o.code;
+      Array.prototype.forEach.call(box.children, function(ch){ ch.className = 'opt'; });
+      b.className = 'opt sel';
+    };
+    box.appendChild(b);
+  });
+  c.appendChild(box);
+  var nav = navRow(onNext, function(){ return sel; });
+  addNav(c, nav);
+  return c;
+};
+
+RENDER.dropdown = function(q, onNext, prev){
+  var c = shell(q, mdToHtml(q.title), q.note);
+  var f = el('div','field');
+  if(q.selectLabel) f.appendChild(el('label', null, q.selectLabel));
+  var s = el('select');
+  s.appendChild(new Option('— Selecciona —',''));
+  q.options.forEach(function(o){ s.appendChild(new Option(o.label, String(o.code))); });
+  if(prev != null) s.value = String(prev);
+  f.appendChild(s);
+  c.appendChild(f);
+  var nav = navRow(onNext, function(){ return s.value === '' ? null : Number(s.value); });
+  addNav(c, nav);
+  return c;
+};
+
+RENDER.scale = function(q, onNext, prev){
+  var c = shell(q, mdToHtml(q.title), q.note);
+  var w = el('div','slider-wrap');
+  var val = el('div','slider-val empty','—');
+  var inp = document.createElement('input');
+  inp.type = 'range'; inp.min = String(q.min); inp.max = String(q.max); inp.step = '1';
+  var selected = (prev == null) ? null : prev;
+  function paint(){
+    if(selected == null){
+      val.textContent = '—'; val.className = 'slider-val empty';
+      inp.className = 'untouched';
+      inp.value = String(Math.round((q.min+q.max)/2));
+    } else {
+      val.textContent = String(selected); val.className = 'slider-val';
+      inp.className = '';
+      inp.value = String(selected);
+    }
+  }
+  inp.oninput = function(){ selected = parseInt(inp.value,10); paint(); };
+  inp.onkeydown = function(e){
+    if(selected == null && (e.key === 'ArrowLeft' || e.key === 'ArrowRight' ||
+       e.key === 'ArrowUp' || e.key === 'ArrowDown' || e.key === 'Home' || e.key === 'End')){
+      selected = parseInt(inp.value,10); paint();
+    }
+  };
+  paint();
+  w.appendChild(val);
+  w.appendChild(inp);
+  var poles = el('div','poles');
+  poles.appendChild(el('span', null, (q.poles && q.poles[0]) || String(q.min)));
+  poles.appendChild(el('span', null, (q.poles && q.poles[1]) || String(q.max)));
+  w.appendChild(poles);
+  c.appendChild(w);
+  var nav = navRow(onNext, function(){ return selected; });
+  addNav(c, nav);
+  return c;
+};
+
+RENDER.grid = function(q, onNext, prev){
+  var group = q.pipeGroup ? leastPreferred(S.answers) : null;
+  var c = shell(q, mdToHtml(q.title), q.note);
+  var vals = {};
+  q.items.forEach(function(it){ vals[it.key] = (prev && prev[it.key] != null) ? prev[it.key] : null; });
+
+  var displayItems = q.items;
+  if(q.randomized && S.orders[q.code]){
+    var byKey = {};
+    q.items.forEach(function(it){ byKey[it.key] = it; });
+    displayItems = S.orders[q.code].map(function(k){ return byKey[k]; }).filter(Boolean);
+  }
+
+  if(q.poleLabels){
+    var pl = el('div','polelegend');
+    pl.appendChild(el('span',null,q.poleLabels[0]));
+    pl.appendChild(el('span',null,q.poleLabels[1]));
+    c.appendChild(pl);
+  }
+  var wrap = el('div','gridwrap');
+  var tbl = el('table','grid');
+  var thead = el('thead');
+  var hr = el('tr');
+  hr.appendChild(el('th','itemcol',''));
+  q.cols.forEach(function(col){ hr.appendChild(el('th',null,col.label)); });
+  thead.appendChild(hr); tbl.appendChild(thead);
+  var tb = el('tbody');
+  displayItems.forEach(function(it){
+    var tr = el('tr');
+    var lbl = it.label;
+    if(group) lbl = lbl.replace(/\{G\}/g, lcFirst(group.label));
+    tr.appendChild(el('td','itemcol', lbl));
+    q.cols.forEach(function(col){
+      var td = el('td','cell' + (vals[it.key] === col.code ? ' sel' : ''), '<span class="dot"></span>');
+      td.onclick = function(){
+        vals[it.key] = col.code;
+        Array.prototype.forEach.call(tr.querySelectorAll('td.cell'), function(x){ x.className = 'cell'; });
+        td.className = 'cell sel';
+      };
+      tr.appendChild(td);
+    });
+    tb.appendChild(tr);
+  });
+  tbl.appendChild(tb);
+  wrap.appendChild(tbl);
+  c.appendChild(wrap);
+  var nav = navRow(onNext, function(){ return vals; });
+  addNav(c, nav);
+  return c;
+};
+
+RENDER.multi = function(q, onNext, prev){
+  var c = shell(q, mdToHtml(q.title), q.note);
+  var vals = {};
+  q.items.forEach(function(it){ vals[it.key] = (prev && prev[it.key] != null) ? prev[it.key] : (it.text ? '' : 0); });
+
+  var displayItems = q.items;
+  if(q.randomized && S.orders[q.code]){
+    var byKey = {};
+    q.items.forEach(function(it){ byKey[it.key] = it; });
+    displayItems = S.orders[q.code].map(function(k){ return byKey[k]; }).filter(Boolean);
+  }
+  var box = el('div','opts');
+  var textInputs = {};
+  displayItems.forEach(function(it){
+    var on = it.text ? !!(vals[it.key] && String(vals[it.key]).length) : vals[it.key] === 1;
+    var b = el('button','opt multi' + (on ? ' sel' : ''));
+    b.type = 'button';
+    b.innerHTML = '<span class="bullet"></span><span>' + it.label + '</span>';
+    var ti = null;
+    if(it.text){
+      ti = document.createElement('input');
+      ti.type = 'text';
+      ti.placeholder = 'Especifica...';
+      ti.style.marginTop = '6px';
+      ti.value = (typeof vals[it.key] === 'string') ? vals[it.key] : '';
+      ti.oninput = function(){
+        vals[it.key] = ti.value;
+        b.className = 'opt multi' + (ti.value.trim() ? ' sel' : '');
+      };
+      textInputs[it.key] = ti;
+    }
+    b.onclick = function(){
+      if(it.text){ if(ti) ti.focus(); return; }
+      var now = vals[it.key] === 1 ? 0 : 1;
+      vals[it.key] = now;
+      if(now && it.exclusive){
+        q.items.forEach(function(o){ if(o.key !== it.key) vals[o.key] = o.text ? '' : 0; });
+        Array.prototype.forEach.call(box.querySelectorAll('.opt'), function(x){ x.className = 'opt multi'; });
+        Object.keys(textInputs).forEach(function(k){ textInputs[k].value = ''; });
+      } else if(now){
+        var ex = q.items.filter(function(o){ return o.exclusive; })[0];
+        if(ex && vals[ex.key] === 1){
+          vals[ex.key] = 0;
+          var exBtn = box.querySelector('[data-k="' + ex.key + '"]');
+          if(exBtn) exBtn.className = 'opt multi';
+        }
+      }
+      b.className = 'opt multi' + (vals[it.key] === 1 ? ' sel' : '');
+    };
+    b.setAttribute('data-k', it.key);
+    box.appendChild(b);
+    if(ti){
+      var holder = el('div');
+      holder.style.margin = '-2px 0 4px 28px';
+      holder.appendChild(ti);
+      box.appendChild(holder);
+    }
+  });
+  c.appendChild(box);
+  var nav = navRow(onNext, function(){ return vals; });
+  addNav(c, nav);
+  return c;
+};
+
+RENDER.info = function(q, onNext, prev){
+  var c = shell(q, null, null);
+  if(q.intro) c.appendChild(el('div','qtitle', q.intro));
+  c.appendChild(el('div','stim doc', q.html));
+  var nav = navRow(onNext, function(){ return prev == null ? 1 : prev; });
+  addNav(c, nav);
+  return c;
+};
+
+RENDER.doc = function(q, onNext, prev){
+  var c = shell(q, null, null);
+  if(q.docTitle) c.appendChild(el('h1', null, q.docTitle));
+  c.appendChild(el('div','doc', q.html));
+  var sel = (prev == null) ? null : prev;
+  if(q.options){
+    if(q.question) c.appendChild(el('div','qtitle', q.question));
+    if(q.note) c.appendChild(el('div','qnote', q.note));
+    var box = el('div','opts');
+    q.options.forEach(function(o){
+      var b = el('button','opt' + (sel === o.code ? ' sel' : ''));
+      b.type = 'button';
+      b.innerHTML = '<span class="bullet"></span><span>' + o.label + '</span>';
+      b.onclick = function(){
+        sel = o.code;
+        Array.prototype.forEach.call(box.children, function(ch){ ch.className = 'opt'; });
+        b.className = 'opt sel';
+      };
+      box.appendChild(b);
+    });
+    c.appendChild(box);
+  }
+  var nav = navRow(onNext, function(){ return q.options ? sel : 1; });
+  addNav(c, nav);
+  return c;
+};
+
+RENDER.birthdate = function(q, onNext, prev){
+  var c = shell(q, mdToHtml(q.title), null);
+  var v = prev || {year:null, month:null};
+  var f1 = el('div','field');
+  f1.appendChild(el('label',null,'Año'));
+  var sy = el('select');
+  sy.appendChild(new Option('— Selecciona —',''));
+  for(var y=2015; y>=1910; y--) sy.appendChild(new Option(String(y), String(y)));
+  if(v.year) sy.value = String(v.year);
+  f1.appendChild(sy);
+  var f2 = el('div','field');
+  f2.appendChild(el('label',null,'Mes'));
+  var sm = el('select');
+  sm.appendChild(new Option('— Selecciona —',''));
+  ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre']
+    .forEach(function(m,i){ sm.appendChild(new Option(m, String(i+1))); });
+  if(v.month) sm.value = String(v.month);
+  f2.appendChild(sm);
+  c.appendChild(f1); c.appendChild(f2);
+  var nav = navRow(onNext, function(){
+    return {year: sy.value ? Number(sy.value) : null, month: sm.value ? Number(sm.value) : null};
+  }, function(){
+    if(!sy.value) return null;
+    var yy = Number(sy.value);
+    if(yy < 1910 || yy > 2015) return 'El año debe estar entre 1910 y 2015.';
+    return null;
+  });
+  addNav(c, nav);
+  return c;
+};
+
+RENDER.residence = function(q, onNext, prev){
+  var c = shell(q, mdToHtml(q.title), null);
+  var v = prev || {};
+  var f1 = el('div','field');
+  f1.appendChild(el('label',null,'Provincia'));
+  var sp = el('select');
+  sp.appendChild(new Option('— Selecciona —',''));
+  PROVINCIAS.forEach(function(p,i){ sp.appendChild(new Option(p[0], String(i))); });
+  if(v.prov_idx != null) sp.value = String(v.prov_idx);
+  f1.appendChild(sp);
+  function txt(labelText, key, ph){
+    var f = el('div','field');
+    f.appendChild(el('label',null,labelText));
+    var t = document.createElement('input');
+    t.type = 'text'; t.placeholder = ph || '';
+    t.value = v[key] || '';
+    f.appendChild(t);
+    c.appendChild(f);
+    return t;
+  }
+  c.appendChild(f1);
+  var tm = txt('Municipio','municipio');
+  var tl = txt('Localidad','localidad');
+  var tz = txt('Código postal','cp','p. ej. 08193');
+  var nav = navRow(onNext, function(){
+    var i = sp.value === '' ? null : Number(sp.value);
+    return {
+      prov_idx: i,
+      provincia: i == null ? null : PROVINCIAS[i][0],
+      region: i == null ? null : PROVINCIAS[i][1],
+      municipio: tm.value, localidad: tl.value, cp: tz.value
+    };
+  });
+  addNav(c, nav);
+  return c;
+};
+
+/* ==========================================================================
+   6. PORTADA (árbol, saltos y reasignación)
+   ========================================================================== */
+
+function condLabel(){
+  var A = S.assign;
+  var out = [];
+  out.push(['Orden de bloques', A.block_order === 'tradeoffs_first' ? 'Trade-offs → Conspiracy beliefs' : 'Conspiracy beliefs → Trade-offs']);
+  if(A.spain_split_exp1 === 'list'){
+    out.push(['Experimento 1', 'Experimento de lista · Rama ' + A.rama + ' (' + (A.rama === 'A' ? 'chemtrails' : 'COVID-19') + ') · list_arm ' + A.list_arm]);
+  } else {
+    out.push(['Experimento 1', 'Batería items_spain (31 ítems, sin experimento de lista)']);
+  }
+  out.push(['Experimento 2', TRAITS[A.condition_traits].name + ' (' + A.condition_traits + '/9)']);
+  if(A.exp3_block === 'debunk')
+    out.push(['Experimento 3', 'DEBUNK · ' + DEBUNK[A.condition_debunk].name + ' (' + A.condition_debunk + '/4)']);
+  else
+    out.push(['Experimento 3', 'PREBUNK · ' + PREBUNK[A.condition_prebunk].name + ' (' + A.condition_prebunk + '/4)']);
+  return out;
+}
+
+function renderHome(){
+  window.scrollTo(0,0);
+  setProgress();
+  app.innerHTML = '';
+  var h = el('div','hero');
+  h.appendChild(el('h1', null, 'Simulador de la encuesta «Teorías políticas»'));
+  h.appendChild(el('p','lead',
+    'Versión de práctica para el equipo TaCT-FoRSED (España). Sirve para recorrer el cuestionario, cronometrarlo y dejar comentarios en cada pantalla. <b>No es la herramienta de recogida de datos del panel.</b>'));
+
+  /* condiciones asignadas */
+  var ab = el('div','assignbox');
+  ab.appendChild(el('h3', null, 'Condiciones asignadas en esta sesión'));
+  var ul = el('ul');
+  condLabel().forEach(function(p){
+    ul.appendChild(el('li', null, '<b>' + p[0] + ':</b> <code>' + p[1] + '</code>'));
+  });
+  ab.appendChild(ul);
+  ab.appendChild(el('p','hint','Esta información no aparece en ningún momento dentro del recorrido.'));
+  h.appendChild(ab);
+
+  /* árbol */
+  h.appendChild(el('h2', null, 'Recorrido asignado'));
+  var tree = el('div','tree');
+  var blocks = [];
+  FLOW.forEach(function(q, i){
+    if(!blocks.length || blocks[blocks.length-1].name !== q.block)
+      blocks.push({name:q.block, start:i, n:0});
+    blocks[blocks.length-1].n++;
+  });
+  var condByBlock = {};
+  var A = S.assign;
+  condByBlock['B3 · TRADE-OFFS'] = A.block_order === 'tradeoffs_first' ? '1r de los dos bloques rotados' : '2º de los dos bloques rotados';
+  condByBlock['B4 · CONSPIRACY BELIEFS'] = A.block_order === 'conspiracy_first' ? '1r de los dos bloques rotados' : '2º de los dos bloques rotados';
+  condByBlock['B7 · EXPERIMENTO 1'] = A.spain_split_exp1 === 'list'
+    ? 'Rama ' + A.rama + ' · list_arm ' + A.list_arm : 'items_spain';
+  condByBlock['B8 · EXPERIMENTO 2'] = TRAITS[A.condition_traits].name;
+  condByBlock['B10 · EXPERIMENTO 3'] = A.exp3_block === 'debunk'
+    ? 'DEBUNK · ' + DEBUNK[A.condition_debunk].name
+    : 'PREBUNK · ' + PREBUNK[A.condition_prebunk].name;
+
+  blocks.forEach(function(b, i){
+    var isExp = /EXPERIMENTO|TRADE-OFFS|CONSPIRACY/.test(b.name);
+    var node = el('div','node' + (isExp ? ' exp' : ''));
+    node.appendChild(el('span','rail', i === blocks.length-1 ? '└─' : '├─'));
+    var a = el('a','jump', b.name);
+    a.href = '#';
+    a.onclick = function(e){ e.preventDefault(); goTo(b.start, true); };
+    node.appendChild(a);
+    if(condByBlock[b.name]) node.appendChild(el('span','cond','· ' + condByBlock[b.name]));
+    node.appendChild(el('span','n', b.n + (b.n === 1 ? ' pantalla' : ' pantallas')));
+    tree.appendChild(node);
+  });
+  h.appendChild(tree);
+  h.appendChild(el('p','hint','Haz clic en un bloque para ir directamente a su primera pantalla. Los saltos quedan registrados en la hoja de respuestas.'));
+
+  /* botones */
+  var row = el('div','btn-row');
+  var start = el('button','nav','Empezar la encuesta →');
+  start.type = 'button';
+  start.onclick = function(){ if(!S.startTs) S.startTs = Date.now(); goTo(0, false); };
+  var re = el('button','nav ghost','↻ Reasignar condiciones');
+  re.type = 'button';
+  re.onclick = function(){
+    if(!confirm('Se volverán a asignar todas las condiciones al azar y se borrarán las respuestas y los comentarios de esta sesión. ¿Continuar?')) return;
+    S.answers = {}; S.comments = {}; S.timings = []; S.derived = {};
+    S.terminated = null; S.startTs = null; S.qStartTs = null; S.sent = false;
+    S.panel.reshuffles++;
+    assignAll();
+    FLOW = buildFlow();
+    idx = null;
+    renderHome();
+  };
+  row.appendChild(start);
+  row.appendChild(re);
+  h.appendChild(row);
+
+  if(S.panel.jumps || S.panel.reshuffles){
+    h.appendChild(el('p','hint','Sesión en modo revisión: ' + S.panel.jumps + ' salto(s), ' + S.panel.reshuffles + ' reasignación(es). Los tiempos no son comparables con una pasada limpia.'));
+  }
+
+  app.appendChild(h);
+}
+
+/* ==========================================================================
+   7. PANTALLA FINAL, EXPORTACIÓN Y ENVÍO
+   ========================================================================== */
+
+function flatValue(q){
+  var v = S.answers[q.code];
+  if(v === undefined) v = null;
+  return v;
+}
+
+function buildFlat(){
+  var flat = {};
+  FLOW.forEach(function(q){
+    var v = S.answers[q.code];
+    if(q.items){
+      q.items.forEach(function(it){
+        flat[it.key] = (v && v[it.key] != null && v[it.key] !== '') ? v[it.key] : '';
+      });
+    } else if(q.type === 'birthdate'){
+      var b = v || {};
+      var age = ageFrom(b.year, b.month);
+      flat.birth_year = b.year == null ? '' : b.year;
+      flat.birth_month = b.month == null ? '' : b.month;
+      flat.RESP_AGE = age == null ? '' : age;
+      flat.QUOTAGERANGE = age == null ? '' : quotAgeRange(age);
+    } else if(q.type === 'residence'){
+      var r = v || {};
+      flat.ESProvincia = r.provincia || '';
+      flat.ESMunicipality = r.municipio || '';
+      flat.ESTownName = r.localidad || '';
+      flat.ESZipcode = r.cp || '';
+      flat.ESREGION2 = r.region == null ? '' : r.region;
+      flat.ESREGION2_nombre = r.region == null ? '' : (REGION_NAMES[r.region] || '');
+    } else {
+      flat[q.varKey] = (v == null) ? '' : v;
+    }
+    flat[q.varKey + '_comment'] = S.comments[q.code] || '';
+  });
+  /* recodificaciones derivadas */
+  var edu = S.answers.ES01EDU;
+  flat.EducationGRP = edu == null ? '' : (edu <= 2 ? 1 : (edu <= 5 ? 2 : 3));
+  flat.S0 = 6;
+  flat.grupo_menos_preferido = S.derived.gmp || '';
+  /* órdenes de presentación */
+  FLOW.forEach(function(q){
+    if(q.randomized && S.orders[q.code]) flat[q.varKey + '_order'] = S.orders[q.code].join(',');
+    if(q.listOrder) flat[q.varKey + '_order'] = q.listOrder.join(' | ');
+  });
+  TRADEOFFS.forEach(function(t){ flat['flip_' + t.code] = S.flips[t.code] ? 1 : 0; });
+  return flat;
+}
+
+function totalSeconds(){
+  return Math.round(S.timings.filter(Boolean).reduce(function(a,b){ return a + b.seconds; }, 0));
+}
+
+function assignPayload(){
+  var A = S.assign;
+  var modo = (S.panel.jumps || S.panel.reshuffles || S.panel.reopened) ? 1 : 0;
+  return {
+    modo_revision: modo,
+    n_saltos: S.panel.jumps,
+    n_reasignaciones: S.panel.reshuffles,
+    block_order: A.block_order,
+    spain_split_exp1: A.spain_split_exp1,
+    rama: A.spain_split_exp1 === 'list' ? A.rama : '',
+    list_arm: A.spain_split_exp1 === 'list' ? A.list_arm : '',
+    condition_traits: TRAITS[A.condition_traits].name,
+    exp3_block: A.exp3_block,
+    condition_debunk: A.exp3_block === 'debunk' ? DEBUNK[A.condition_debunk].name : '',
+    condition_prebunk: A.exp3_block === 'prebunk' ? PREBUNK[A.condition_prebunk].name : '',
+    terminado_en: S.terminated || ''
+  };
+}
+
+function renderEnd(){
+  window.scrollTo(0,0);
+  app.innerHTML = '';
+  var c = el('div','card');
+
+  if(S.terminated === 'consent'){
+    c.appendChild(el('h1', null, 'La encuesta ha finalizado'));
+    c.appendChild(el('div','warnbox','<p>Has indicado que <b>no</b> deseas participar, de modo que la encuesta termina aquí. Gracias de todos modos por tu tiempo.</p><p>Si te has equivocado, puedes volver atrás y cambiar la respuesta.</p>'));
+  } else if(S.terminated === 'age'){
+    c.appendChild(el('h1', null, 'La encuesta ha finalizado'));
+    c.appendChild(el('div','warnbox','<p>Esta encuesta está dirigida a personas de <b>18 años o más</b>. Gracias por tu interés.</p><p>Si te has equivocado con la fecha de nacimiento, puedes volver atrás y corregirla.</p>'));
+  } else {
+    c.appendChild(el('h1', null, 'Fin del recorrido'));
+    c.appendChild(el('div','ok','<p>Has completado el simulador. Gracias por dedicarle el tiempo.</p>'));
+  }
+
+  var secs = totalSeconds();
+  var mins = Math.floor(secs/60), rest = secs % 60;
+  c.appendChild(el('p', null, '<b>Tiempo total registrado:</b> ' + mins + ' min ' + rest + ' s · ' +
+    S.timings.filter(Boolean).length + ' pantallas cronometradas de ' + FLOW.length + '.'));
+
+  var mod = assignPayload();
+  if(mod.modo_revision){
+    c.appendChild(el('div','warnbox','<p>Esta sesión ha usado el panel de revisión (' +
+      mod.n_saltos + ' salto(s), ' + mod.n_reasignaciones + ' reasignación(es)). ' +
+      'Los tiempos <b>no</b> son comparables con una pasada limpia; la fila quedará marcada con <code>modo_revision = 1</code>.</p>'));
+  }
+
+  /* repaso de comentarios */
+  c.appendChild(el('h2', null, 'Tus comentarios'));
+  var any = false;
+  var rl = el('div','reviewlist');
+  FLOW.forEach(function(q){
+    var t = (S.comments[q.code]||'').trim();
+    if(!t) return;
+    any = true;
+    var r = el('div','r');
+    r.appendChild(el('div','k', q.block + ' · ' + q.varKey + '_comment'));
+    r.appendChild(el('div', null, t.replace(/&/g,'&amp;').replace(/</g,'&lt;')));
+    rl.appendChild(r);
+  });
+  if(!any) rl.appendChild(el('p','hint','No has escrito ningún comentario.'));
+  c.appendChild(rl);
+
+  /* condiciones (ya se pueden mostrar: el debriefing revela el diseño) */
+  c.appendChild(el('h2', null, 'Condiciones de esta sesión'));
+  var ul = el('ul');
+  condLabel().forEach(function(p){ ul.appendChild(el('li', null, '<b>' + p[0] + ':</b> ' + p[1])); });
+  c.appendChild(ul);
+
+  /* envío */
+  var row = el('div','btn-row');
+  var back = el('button','nav ghost','← Atrás');
+  back.type = 'button'; back.onclick = goBack;
+  row.appendChild(back);
+  var send = el('button','nav','Enviar respuestas');
+  send.type = 'button';
+  var status = el('div','qnote');
+  send.onclick = function(){
+    if(!APPS_SCRIPT_URL){
+      status.innerHTML = '<b>No hay ninguna URL de recogida configurada.</b> Las respuestas no se han enviado. Rellena <code>APPS_SCRIPT_URL</code> en el HTML.';
+      return;
+    }
+    send.disabled = true;
+    status.textContent = 'Enviando...';
+    var payload = {
+      flat: buildFlat(),
+      assign: assignPayload(),
+      timestampClient: new Date().toISOString(),
+      totalSeconds: totalSeconds()
+    };
+    fetch(APPS_SCRIPT_URL, {method:'POST', mode:'no-cors', headers:{'Content-Type':'text/plain;charset=utf-8'}, body:JSON.stringify(payload)})
+      .then(function(){
+        S.sent = true;
+        status.innerHTML = 'Enviado. El navegador <b>no puede confirmar</b> la respuesta del servidor (envío sin CORS): comprueba la hoja de cálculo para verificar que la fila ha llegado.';
+      })
+      .catch(function(e){
+        send.disabled = false;
+        status.textContent = 'Error al enviar: ' + e;
+      });
+  };
+  row.appendChild(send);
+  c.appendChild(row);
+  c.appendChild(status);
+
+  var home = el('div','footlink','<a href="#">Volver al panel del simulador</a>');
+  home.querySelector('a').onclick = function(e){ e.preventDefault(); idx = null; S.panel.reopened++; renderCurrent(); };
+  c.appendChild(home);
+
+  app.appendChild(c);
+  setProgress();
+}
+
+/* ==========================================================================
+   8. ARRANQUE
+   ========================================================================== */
+function boot(){
+  assignAll();
+  FLOW = buildFlow();
+  idx = null;
+  renderHome();
+}
+if(typeof document !== 'undefined' && document.getElementById('app')) boot();
+</script>
+</body>
+</html>
